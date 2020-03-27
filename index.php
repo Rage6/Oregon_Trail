@@ -1,0 +1,22 @@
+<?php
+  session_start();
+  require_once("pdo.php");
+  require_once("index_lead.php");
+?>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Oregon Trail Card Game</title>
+    <link rel="stylesheet" type="text/css" href="index_css/css_360px.css"></link>
+    <script src="index_js/main.js"></script>
+  </head>
+  <body>
+    <div class="headTitle">Oregon Trail</div>
+    <form method="POST">
+      <input type="submit" name="newGame" value="START NEW GAME" /></br>
+      <input type="text" name="partyName" placeholder="Enter your new party's name"/></br>
+    </form>
+  </body>
+</html>

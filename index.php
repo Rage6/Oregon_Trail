@@ -14,9 +14,22 @@
   </head>
   <body>
     <div class="headTitle">Oregon Trail</div>
-    <form method="POST">
-      <input type="submit" name="newGame" value="START NEW GAME" /></br>
-      <input type="text" name="partyName" placeholder="Enter your new party's name"/></br>
-    </form>
+    <?php
+      if (isset($_SESSION['message'])) {
+        echo($_SESSION['message']);
+        unset($_SESSION['message']);
+      };
+    ?>
+    <div>
+      <div>
+        START A NEW GAME
+      </div>
+      <form method="POST">
+        <input type="text" name="partyName" placeholder="Enter your new party's name"/></br>
+        <input type="submit" name="newGame" value="GO!" /></br>
+      </form>
+      <div>Instructions</div>
+      <div>(Don't worry, you can find them during the game too)</div>
+    </div>
   </body>
 </html>

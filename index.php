@@ -10,6 +10,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Oregon Trail Card Game</title>
     <link rel="stylesheet" type="text/css" href="index_css/css_360px.css"></link>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    crossorigin="anonymous"></script>
     <script src="index_js/main.js"></script>
   </head>
   <body>
@@ -21,13 +24,40 @@
       };
     ?>
     <div>
-      <div>
+      <div id="newGameBttn" class="newGameBttn">
         START A NEW GAME
       </div>
-      <form method="POST">
-        <input type="text" name="partyName" placeholder="Enter your new party's name"/></br>
-        <input type="submit" name="newGame" value="GO!" /></br>
-      </form>
+      <div id="newGameBox" class="newGameBox">
+        <form method="POST">
+          <div>
+            Travel party name:
+            <input type="text" name="partyName" placeholder="required"/>
+          </div>
+          <div>
+            Number of members:
+            <select name="playerTotal">
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+          </div>
+          <div>
+            Your character name:
+            <input type="text" name="partyLeader" placeholder="required"/>
+          </div>
+          <div>
+            First name:
+            <input type="text" name="firstName" placeholder="optional"/>
+          </div>
+          <div>
+            Last name:
+            <input type="text" name="lastName" placeholder="optional"/>
+          </div>
+          <div>
+            <input type="submit" name="newGame" value="GO!" />
+          </div>
+        </form>
+      </div>
       <div>Instructions</div>
       <div>(Don't worry, you can find them during the game too)</div>
     </div>

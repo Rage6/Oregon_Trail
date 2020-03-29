@@ -1,3 +1,14 @@
 .headTitle {
   color: red;
 }
+
+.newGameBttn {
+  background-color: green;
+  color: white;
+}
+
+.newGameBox {
+  display: none;
+  background-color: green;
+  color: white;
+}

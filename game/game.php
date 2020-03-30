@@ -12,7 +12,12 @@
     <title>Oregon Trail | <?php echo($getGameInfo['party_name']); ?></title>
   </head>
   <body>
-    The game starts now.
+    <div>
+      Invitation Link: <?php echo($currentHost."/Oregon_Trail?token=".$_GET['token']); ?>
+    </div>
+    <div>
+      The game starts now.
+    </div>
     <?php
       if (isset($_SESSION['message'])) {
         echo($_SESSION['message']);

@@ -69,8 +69,8 @@
   // var_dump($_SESSION);
   // echo("</pre>");
 
-  echo("<pre>");
-  var_dump($allPlayerId);
-  echo("</pre>");
+  // echo("<pre>");
+  // var_dump($allPlayerId);
+  // echo("</pre>");
 
 ?>

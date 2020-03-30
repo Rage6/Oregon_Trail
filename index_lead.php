@@ -1,11 +1,26 @@
 <?php
 
-  // echo("<div>Post:</div><pre>");
-  // var_dump($_POST);
-  // echo("</pre><div>Session:</div>");
-  // echo("<pre>");
-  // var_dump($_SESSION);
-  // echo("</pre>");
+  // Takes any players back to their current game, based on any existing player_id
+  if (isset($_SESSION['playerId'])) {
+    $findPlayerStmt = $pdo->prepare("SELECT token FROM Player INNER JOIN Game WHERE Player.game_id=Game.game_id AND player_id=:pl");
+    $findPlayerStmt->execute(array(
+      ':pl'=>htmlentities($_SESSION['playerId'])
+    ));
+    $allPlayerId = [];
+    while ($onePlayerId = $findPlayerStmt->fetch(PDO::FETCH_ASSOC)) {
+      $allPlayerId[] = $onePlayerId;
+    };
+    if (count($allPlayerId) == 1) {
+      $currentToken = $allPlayerId[0]['token'];
+      header("Location: game/game.php?token=".$currentToken);
+      exit;
+    } else {
+      $_SESSION['message'] = "<div style='color:red'>Your prior game must have ended.</div>";
+      unset($_SESSION);
+      header("Location: index.php");
+      exit;
+    };
+  };
 
   if (isset($_POST['newGame'])) {
     if ($_POST['partyName'] == '') {
@@ -39,10 +54,23 @@
           ':gi'=>$gameId
         ));
         $_SESSION['message'] = "<div style='color:green'>Your party was created!</div>";
+        $userId = $pdo->lastInsertId();
+        $_SESSION['playerId'] = $userId;
         header("Location: game/game.php?token=".$newToken);
         exit;
       };
     };
   };
+
+  // echo("<div>Post:</div><pre>");
+  // var_dump($_POST);
+  // echo("</pre><div>Session:</div>");
+  // echo("<pre>");
+  // var_dump($_SESSION);
+  // echo("</pre>");
+
+  echo("<pre>");
+  var_dump($allPlayerId);
+  echo("</pre>");
 
 ?>

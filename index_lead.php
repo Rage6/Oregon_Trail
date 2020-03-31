@@ -44,7 +44,7 @@
           ':ps'=>htmlentities($_POST['playerTotal']),
           ':ue'=>40
         ));
-        // ... and this makes the creator's player.
+        // ... and this makes the creator's player...
         $gameId = $pdo->lastInsertId();
         $insertLeadPlyrStmt = $pdo->prepare("INSERT INTO Player (username,first_name,last_name,game_id) VALUES (:us,:fn,:ls,:gi)");
         $insertLeadPlyrStmt->execute(array(
@@ -54,13 +54,14 @@
           ':gi'=>$gameId
         ));
         $_SESSION['message'] = "<div style='color:green'>Your party was created!</div>";
+        // ... and this puts the creator's ID into the game's "party_head" column.
         $userId = $pdo->lastInsertId();
+        $_SESSION['player_id'] = $userId;
         $updateGameHeadStmt = $pdo->prepare("UPDATE Game SET party_head=:ud WHERE game_id=:gd");
         $updateGameHeadStmt->execute(array(
           ':ud'=>$userId,
           ':gd'=>$gameId
         ));
-        $_SESSION['playerId'] = $userId;
         header("Location: game/game.php?token=".$newToken);
         exit;
       };
@@ -72,10 +73,6 @@
   // echo("</pre><div>Session:</div>");
   // echo("<pre>");
   // var_dump($_SESSION);
-  // echo("</pre>");
-
-  // echo("<pre>");
-  // var_dump();
   // echo("</pre>");
 
 ?>

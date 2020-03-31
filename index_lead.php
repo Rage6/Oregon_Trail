@@ -55,6 +55,11 @@
         ));
         $_SESSION['message'] = "<div style='color:green'>Your party was created!</div>";
         $userId = $pdo->lastInsertId();
+        $updateGameHeadStmt = $pdo->prepare("UPDATE Game SET party_head=:ud WHERE game_id=:gd");
+        $updateGameHeadStmt->execute(array(
+          ':ud'=>$userId,
+          ':gd'=>$gameId
+        ));
         $_SESSION['playerId'] = $userId;
         header("Location: game/game.php?token=".$newToken);
         exit;
@@ -70,7 +75,7 @@
   // echo("</pre>");
 
   // echo("<pre>");
-  // var_dump($allPlayerId);
+  // var_dump();
   // echo("</pre>");
 
 ?>

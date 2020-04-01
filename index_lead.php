@@ -54,7 +54,7 @@
           ':gi'=>$gameId
         ));
         $_SESSION['message'] = "<div style='color:green'>Your party was created!</div>";
-        // ... and this puts the creator's ID into the game's "party_head" column.
+        // ... and this puts the creator's ID into the game's "party_head" column...
         $userId = $pdo->lastInsertId();
         $_SESSION['player_id'] = $userId;
         $updateGameHeadStmt = $pdo->prepare("UPDATE Game SET party_head=:ud WHERE game_id=:gd");
@@ -62,6 +62,8 @@
           ':ud'=>$userId,
           ':gd'=>$gameId
         ));
+        // ... and creates the game's new JSON file.
+        $gameJson = fopen("game/json/game_".$gameId.".json","wb");
         header("Location: game/game.php?token=".$newToken);
         exit;
       };

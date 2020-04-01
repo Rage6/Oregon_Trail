@@ -10,6 +10,7 @@
   <head>
     <meta charset="utf-8">
     <title>Oregon Trail | <?php echo($getGameInfo['party_name']); ?></title>
+    <script src="json/game_<?php echo($getGameId) ?>.json"></script>
   </head>
   <body>
     <div>
@@ -23,6 +24,9 @@
         echo($_SESSION['message']);
         unset($_SESSION['message']);
       };
+      if ($partyHead == true) {
+        echo("<div>You are the leader of the party!</div>");
+      }
     ?>
   </body>
 </html>

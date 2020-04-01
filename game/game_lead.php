@@ -8,9 +8,9 @@
     ));
     $getGameInfo = $getGameInfoStmt->fetch(PDO::FETCH_ASSOC);
     $getGameId = $getGameInfo['game_id'];
-    echo("<pre>");
-    var_dump($getGameInfo);
-    echo("</pre>");
+    // echo("<pre>");
+    // var_dump($getGameInfo);
+    // echo("</pre>");
   } else {
     $_SESSION['message'] = "<div style='color:red'>Your link did not include a required token. Talk to your party leader for a completed link.</div>";
     header("Location: ../index.php");
@@ -24,16 +24,16 @@
     $partyHead = false;
   };
 
-  echo("<pre>");
-  var_dump($_GET);
-  echo("</pre>");
-
-  echo("<pre>");
-  var_dump($_POST);
-  echo("</pre>");
-
-  echo("<pre>");
-  var_dump($_SESSION);
-  echo("</pre>");
+  // echo("<pre>");
+  // var_dump($_GET);
+  // echo("</pre>");
+  //
+  // echo("<pre>");
+  // var_dump($_POST);
+  // echo("</pre>");
+  //
+  // echo("<pre>");
+  // var_dump($_SESSION);
+  // echo("</pre>");
 
 ?>

@@ -21,7 +21,7 @@
   <body>
 
     <div>
-      Invitation Link: <?php echo($currentHost."/Oregon_Trail?token=".$_GET['token']); ?>
+      Invitation Link: <?php echo($currentHost."/Oregon_Trail/game/game.php?token=".$_GET['token']); ?>
     </div>
     <div>
       The game starts now.

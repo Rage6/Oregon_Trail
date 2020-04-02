@@ -71,15 +71,19 @@
     exit;
   };
 
-  // To end a game and delete a game, players
+  // To end a party and delete a game, the party leader can use this
   if (isset($_POST['deleteGame'])) {
     $deleteGameStmt = $pdo->prepare("DELETE FROM Game WHERE game_id=:gi");
     $deleteGameStmt->execute(array(
       ':gi'=>$getGameId
     ));
     unset($_SESSION['player_id']);
-    $filename = "json/game_".$getGameId.".json";
-    unlink($filename);
+    $folderPath = "json/game_".$getGameId;
+    $folderContent = glob($folderPath."/*");
+    foreach($folderContent as $oneFile) {
+      unlink($oneFile);
+    };
+    rmdir($folderPath);
     $_SESSION['message'] = "<div style='color:blue'>Your game is now deleted.</div>";
     header("Location: ../index.php");
     exit;

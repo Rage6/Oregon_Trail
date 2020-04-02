@@ -23,16 +23,12 @@
   };
 
   if (isset($_POST['newGame'])) {
-
-    // Check here to block someone from making a party if they are in another party right now
-
     if ($_POST['partyName'] == '') {
       $_SESSION['message'] = "<div style='color:red'>Your party must have a name</div>";
       header("Location: index.php");
       exit;
     } else {
       if ($_POST['partyLeader'] == '') {
-        $_SESSION['message'] = "<div style='color:red'>Your character must have a name</div>";
         header("Location: index.php");
         exit;
       } else {
@@ -66,7 +62,20 @@
           ':gd'=>$gameId
         ));
         // ... and creates the game's new JSON file.
-        $gameJson = fopen("game/json/game_".$gameId.".json","wb");
+        mkdir("game/json/game_".$gameId);
+        $gameFile = fopen("game/json/game_".$gameId."/game.json","wb");
+        $gameInfoStmt = $pdo->prepare("SELECT * FROM Game WHERE game_id=:gid");
+        $gameInfoStmt->execute(array(
+          ':gid'=>$gameId
+        ));
+        $gameInfoArray = [];
+        while ($oneGameInfo = $gameInfoStmt->fetch(PDO::FETCH_ASSOC)) {
+          $gameInfoArray[] = $oneGameInfo;
+        };
+        fwrite("game/json/game_".$gameId."/game.json",$gameInfoArray);
+        fclose($filename);
+        // $_SESSION['message'] = "<div style='color:red'>Your character must have a name</div>";
+        $_SESSION['message'] = "<pre>".$gameInfoArray."</pre>";
         header("Location: game/game.php?token=".$newToken);
         exit;
       };

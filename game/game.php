@@ -33,7 +33,8 @@
     </div>
     <?php
       if (isset($_SESSION['message'])) {
-        echo($_SESSION['message']);
+        // echo($_SESSION['message']);
+        var_dump($_SESSION['message']);
         unset($_SESSION['message']);
       };
       if ($partyHead == true) {

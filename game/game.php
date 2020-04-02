@@ -15,7 +15,7 @@
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
     integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
     crossorigin="anonymous"></script>
-    <script src="json/game_<?php echo($getGameId) ?>.json"></script>
+    <script src="json/game_<?php echo($getGameId) ?>/game_<?php echo($getGameId) ?>.json"></script>
     <script src="js/main.js"></script>
   </head>
   <body>
@@ -33,8 +33,10 @@
     </div>
     <?php
       if (isset($_SESSION['message'])) {
-        // echo($_SESSION['message']);
-        var_dump($_SESSION['message']);
+        echo($_SESSION['message']);
+        // echo("<pre>");
+        // var_dump($_SESSION['message']);
+        // echo("</pre>");
         unset($_SESSION['message']);
       };
       if ($partyHead == true) {

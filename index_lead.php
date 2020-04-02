@@ -60,9 +60,8 @@
           ':ud'=>$userId,
           ':gd'=>$gameId
         ));
-        // ... and creates the game's new JSON file.
+        // ... and creates the game's new JSON folder w/ files.
         mkdir("game/json/game_".$gameId);
-        $gameFile = fopen("game/json/game_".$gameId."/game.json","wb");
         $gameInfoStmt = $pdo->prepare("SELECT * FROM Game WHERE game_id=:gid");
         $gameInfoStmt->execute(array(
           ':gid'=>(int)$gameId
@@ -71,9 +70,12 @@
         while ($oneGameInfo = $gameInfoStmt->fetch(PDO::FETCH_ASSOC)) {
           $gameInfoArray[] = $oneGameInfo;
         };
-        fwrite("game/json/game_".$gameId."/game.json",$gameInfoArray);
-        fclose($filename);
+        $gameInfoArray[0]["current_player"] = $userId;
+        $newFile = fopen("game/json/game_".$gameId."/game_".$gameId.".json","w");
+        fwrite($newFile, json_encode($gameInfoArray));
+        fclose($newFile);
         $_SESSION['message'] = "<div style='color:green'>Your party was created!</div>";
+        // $_SESSION['message'] = $gameInfoArray;
         header("Location: game/game.php?token=".$newToken);
         exit;
       };

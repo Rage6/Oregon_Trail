@@ -7,10 +7,9 @@ require_once("join_lead.php");
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Oregon Trail | Join the <?php echo($getGameInfo['party_name']); ?></title>
+    <title>Oregon Trail | Join "<?php echo($getGameInfo['party_name']); ?>"</title>
   </head>
   <body>
-    This is the join party. It's token is: <?php echo($_GET['token']) ?></br>
     <form method="POST">
       <div>
         Your character name:

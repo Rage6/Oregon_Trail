@@ -1,10 +1,10 @@
 <?php
 
   // Takes any players back to their current game, based on any existing player_id
-  if (isset($_SESSION['playerId'])) {
+  if (isset($_SESSION['player_id']) && !isset($_GET['invalid'])) {
     $findPlayerStmt = $pdo->prepare("SELECT token FROM Player INNER JOIN Game WHERE Player.game_id=Game.game_id AND player_id=:pl");
     $findPlayerStmt->execute(array(
-      ':pl'=>htmlentities($_SESSION['playerId'])
+      ':pl'=>htmlentities($_SESSION['player_id'])
     ));
     $allPlayerId = [];
     while ($onePlayerId = $findPlayerStmt->fetch(PDO::FETCH_ASSOC)) {
@@ -23,6 +23,9 @@
   };
 
   if (isset($_POST['newGame'])) {
+
+    // Check here to block someone from making a party if they are in another party right now
+
     if ($_POST['partyName'] == '') {
       $_SESSION['message'] = "<div style='color:red'>Your party must have a name</div>";
       header("Location: index.php");
@@ -67,6 +70,18 @@
         header("Location: game/game.php?token=".$newToken);
         exit;
       };
+    };
+  };
+
+  if (isset($_POST['resetCharacter'])) {
+    // This deletes a user's current character from another game
+    if (isset($_SESSION['player_id'])) {
+      $delCurrentPlyrStmt = $pdo->prepare("DELETE FROM Player WHERE player_id=:pid");
+      $delCurrentPlyrStmt->execute(array(
+        ':pid'=>htmlentities($_SESSION['player_id'])
+      ));
+      header("Location: ../join/join.php?token=".$_GET['token']);
+      exit;
     };
   };
 

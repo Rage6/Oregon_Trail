@@ -32,6 +32,9 @@
       The game starts now.
     </div>
     <div id="playerStatus"></div>
+    <form id="clickBox">
+      <!-- button is added here when it is the player's turn -->
+    </form>
     <?php
       if (isset($_SESSION['message'])) {
         echo($_SESSION['message']);

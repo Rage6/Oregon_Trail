@@ -22,6 +22,7 @@
     };
   };
 
+  // What takes place when a new game is started
   if (isset($_POST['newGame'])) {
     if ($_POST['partyName'] == '') {
       $_SESSION['message'] = "<div style='color:red'>Your party must have a name</div>";
@@ -60,8 +61,9 @@
           ':ud'=>$userId,
           ':gd'=>$gameId
         ));
-        // ... and creates the game's new JSON folder w/ files.
+        // ... and creates the game's new folder...
         mkdir("game/json/game_".$gameId);
+        // ... and creates the new game JSON file...
         $gameInfoStmt = $pdo->prepare("SELECT * FROM Game WHERE game_id=:gid");
         $gameInfoStmt->execute(array(
           ':gid'=>(int)$gameId
@@ -71,11 +73,22 @@
           $gameInfoArray[] = $oneGameInfo;
         };
         $gameInfoArray[0]["current_player"] = $userId;
-        $newFile = fopen("game/json/game_".$gameId."/game_".$gameId.".json","w");
-        fwrite($newFile, json_encode($gameInfoArray));
-        fclose($newFile);
+        $newGameFile = fopen("game/json/game_".$gameId."/game_".$gameId.".json","w");
+        fwrite($newGameFile, json_encode($gameInfoArray));
+        fclose($newGameFile);
+        // ... and creates the player JSON file...
+        $playerInfoStmt = $pdo->prepare("SELECT * FROM Player WHERE game_id=:gm");
+        $playerInfoStmt->execute(array(
+          ':gm'=>(int)$gameId
+        ));
+        $playerInfoArray = [];
+        while ($onePlayerInfo = $playerInfoStmt->fetch(PDO::FETCH_ASSOC)) {
+          $playerInfoArray[] = $onePlayerInfo;
+        };
+        $newPlayerFile = fopen("game/json/game_".$gameId."/player_".$gameId.".json","w");
+        fwrite($newPlayerFile, json_encode($playerInfoArray));
+        fclose($newPlayerFile);
         $_SESSION['message'] = "<div style='color:green'>Your party was created!</div>";
-        // $_SESSION['message'] = $gameInfoArray;
         header("Location: game/game.php?token=".$newToken);
         exit;
       };

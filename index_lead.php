@@ -89,7 +89,7 @@
       $delCurrentPlyrStmt->execute(array(
         ':pid'=>htmlentities($_SESSION['player_id'])
       ));
-      header("Location: ../join/join.php?token=".$_GET['token']);
+      header("Location: join/join.php?token=".$_GET['token']);
       exit;
     };
   };

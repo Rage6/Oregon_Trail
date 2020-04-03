@@ -3,6 +3,7 @@
   session_start();
   require_once("../pdo.php");
   require_once("game_lead.php");
+  // require_once("json/game_".$getGameId."/game_".$getGameId.".json");
 
 ?>
 <!DOCTYPE html>
@@ -15,10 +16,9 @@
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
     integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
     crossorigin="anonymous"></script>
-    <script src="json/game_<?php echo($getGameId) ?>/game_<?php echo($getGameId) ?>.json"></script>
     <script src="js/main.js"></script>
   </head>
-  <body>
+  <body data-game="<?php echo($getGameId) ?>" data-player="<?php echo($_SESSION['player_id']) ?>">
     <?php
       if ($partyHead == true) {
         echo("
@@ -31,6 +31,7 @@
     <div>
       The game starts now.
     </div>
+    <div id="playerStatus"></div>
     <?php
       if (isset($_SESSION['message'])) {
         echo($_SESSION['message']);

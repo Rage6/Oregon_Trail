@@ -56,9 +56,10 @@
         // ... and this puts the creator's ID into the game's "party_head" column...
         $userId = $pdo->lastInsertId();
         $_SESSION['player_id'] = $userId;
-        $updateGameHeadStmt = $pdo->prepare("UPDATE Game SET party_head=:ud WHERE game_id=:gd");
+        $updateGameHeadStmt = $pdo->prepare("UPDATE Game SET party_head=:ud, current_player=:cp WHERE game_id=:gd");
         $updateGameHeadStmt->execute(array(
           ':ud'=>$userId,
+          ':cp'=>$userId,
           ':gd'=>$gameId
         ));
         // ... and creates the game's new folder...
@@ -72,7 +73,6 @@
         while ($oneGameInfo = $gameInfoStmt->fetch(PDO::FETCH_ASSOC)) {
           $gameInfoArray[] = $oneGameInfo;
         };
-        $gameInfoArray[0]["current_player"] = $userId;
         $newGameFile = fopen("game/json/game_".$gameId."/game_".$gameId.".json","w");
         fwrite($newGameFile, json_encode($gameInfoArray));
         fclose($newGameFile);

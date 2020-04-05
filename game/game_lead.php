@@ -20,7 +20,7 @@
     $_SESSION['message'] = "<div style='color:red'>Your link did not include a required token. Talk to your party leader for a completed link.</div>";
     header("Location: ../index.php");
     exit;
-  }
+  };
 
   // Checks if you are a party member already
   if (isset($_SESSION['player_id'])) {
@@ -71,9 +71,40 @@
     exit;
   };
 
-  // Ends a turn and switches to next player
+  // Turn the next player into the current player
   if (isset($_POST['playerId'])) {
-
+    $currentPlayer = $getGameInfo[0]['current_player'];
+    // First, identify the next player's id number
+    $allPlayerStmt = $pdo->prepare("SELECT player_id FROM Player WHERE game_id=$getGameId");
+    $allPlayerStmt->execute();
+    $allPlayerList = [];
+    while ($onePlayer = $allPlayerStmt->fetch(PDO::FETCH_ASSOC)) {
+      $allPlayerList[] = $onePlayer;
+    };
+    $lastPlayerNum = count($allPlayerList) - 1;
+    $lastPlayerId = $allPlayerList[$lastPlayerNum];
+    for ($playerNum = 0; $playerNum <= $lastPlayerNum; $playerNum++) {
+      if ($allPlayerList[$playerNum]['player_id'] == (int)$currentPlayer) {
+        if ((int)$currentPlayer == $lastPlayerId) {
+          $nextPlayerId = $allPlayerList[0]['player_id'];
+        } else {
+          $nextNum = $playerNum++;
+          $nextPlayerId = $allPlayerList[$nextNum]['player_id'];
+        };
+      };
+    };
+    // Second, change the current_player in the dB
+    $switchPlayerStmt = $pdo->prepare("UPDATE Game SET current_player=:np WHERE game_id=:gid");
+    $switchPlayerStmt->execute(array(
+      ':np'=>htmlentities($nextPlayerId),
+      ':gid'=>$getGameId
+    ));
+    // Third, use the updated dB to update the JSON file
+    $jsonFile = file_get_contents("json/game_".$getGameId."/player_".$getGameId.".json");
+    $decodedJson = json_decode($jsonFile, true);
+    echo("<pre>");
+    var_dump($decodedJson);
+    echo("</pre>");
   };
 
   // To end a party and delete a game, the party leader can use this

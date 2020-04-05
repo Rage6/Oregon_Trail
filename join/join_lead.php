@@ -26,6 +26,7 @@
       header("Location: join.php?token=".$_GET['token']);
       exit;
     } else {
+      // Adds player to the database
       $addPlayerStmt = $pdo->prepare("INSERT INTO Player(username,first_name,last_name,alive,skips_left,is_shop,game_id) VALUES (:un,:fn,:ls,1,0,0,:gi)");
       $addPlayerStmt->execute(array(
         ':un'=>htmlentities($_POST['username']),

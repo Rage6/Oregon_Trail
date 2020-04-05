@@ -71,8 +71,17 @@
     exit;
   };
 
+  // Ends a turn and switches to next player
+  if (isset($_POST['playerId'])) {
+
+  };
+
   // To end a party and delete a game, the party leader can use this
   if (isset($_POST['deleteGame'])) {
+    $deletePlayersStmt = $pdo->prepare("DELETE FROM Player WHERE Player.game_id=:plg");
+    $deletePlayersStmt->execute(array(
+      ':plg'=>$getGameId
+    ));
     $deleteGameStmt = $pdo->prepare("DELETE FROM Game WHERE game_id=:gi");
     $deleteGameStmt->execute(array(
       ':gi'=>$getGameId

@@ -31,6 +31,7 @@
     <div>
       The game starts now.
     </div>
+    <div>Current Player: <span id="currentName"></span></div>
     <div id="playerStatus"></div>
     <form id="clickBox">
       <!-- button is added here when it is the player's turn -->

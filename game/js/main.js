@@ -4,6 +4,7 @@ $(()=>{
 
   const gameId = $("body").attr('data-game');
   const gameUrl = "json/game_" + gameId + "/game_" + gameId + ".json";
+  const playerUrl = "json/game_" + gameId + "/player_" + gameId + ".json";
 
   let currentPlayer = $("body").attr('data-player');
 
@@ -28,11 +29,11 @@ $(()=>{
 
   window.setInterval(()=>{
     // For Game information...
-    let xhRequest = new XMLHttpRequest();
-    xhRequest.open('GET', gameUrl, true);
-    xhRequest.onload = () => {
-      if (xhRequest.status == 200) {
-        let gameData = JSON.parse(xhRequest.responseText);
+    let gameRequest = new XMLHttpRequest();
+    gameRequest.open('GET', gameUrl, true);
+    gameRequest.onload = () => {
+      if (gameRequest.status == 200) {
+        let gameData = JSON.parse(gameRequest.responseText);
         console.log(gameData);
         // currentPlayer = $("body").attr('data-player');
         if (gameData[0]["current_player"] == currentPlayer) {
@@ -46,12 +47,25 @@ $(()=>{
         };
       }
     };
-    xhRequest.onerror = () => {
-      console.log("An error occurred");
+    gameRequest.onerror = () => {
+      console.log("An error occurred in gameData");
     };
-    xhRequest.send();
-
+    gameRequest.send();
     // For Player information
+    let playerRequest = new XMLHttpRequest();
+    playerRequest.open('GET', playerUrl, true);
+    playerRequest.onload = () => {
+      if (playerRequest.status == 200) {
+        let playerData = JSON.parse(playerRequest.responseText);
+        // console.log(playerData);
+
+      };
+    };
+    playerRequest.onerror = () => {
+      console.log("An error occurred in playerData");
+    };
+    playerRequest.send();
+
   }, 5000);
 
   $("#clickBox").submit((e)=>{
@@ -59,7 +73,17 @@ $(()=>{
     nextTurn();
   });
 
-  const nextTurn = () =>{
+  const nextTurn = (e) =>{
+    e.preventDefault();
+    let playerParam = "playerId=" + currentPlayer;
+    let turnRequest = new XMLHttpRequest();
+    turnRequest.open('POST','../game_lead.php', true);
+    turnRequest.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+    turnRequest.onload = () => {
+      console.log("turnRequest worked");
+    };
+    turnRequest.send(playerParam);
+    // ...and the next player becomes the current player.
     console.log("Player " + currentPlayer + " clicked.");
   }
 

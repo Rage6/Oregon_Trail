@@ -1,6 +1,4 @@
-// console.log("index_js/main.js is working");
-
-$(()=>{
+$(document).ready(()=>{
 
   // Show or hide the form for starting a new game
   $("#newGameBttn").click(()=>{

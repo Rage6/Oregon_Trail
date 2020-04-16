@@ -23,7 +23,7 @@
       if ($partyHead == true) {
         echo("
           <div>
-            Invitation Link: ".$currentHost."/Oregon_Trail/game/game.php?token=".$_GET['token']."
+            Invitation Link: ".$currentHost."/Oregon_Trail/game/game.php?token=".htmlentities($_GET['token'])."
           </div>
         ");
       };
@@ -33,9 +33,10 @@
     </div>
     <div>Current Player: <span id="currentName"></span></div>
     <div id="playerStatus"></div>
-    <form id="clickBox">
-      <!-- button is added here when it is the player's turn -->
-    </form>
+    <div class="clickBox">
+      <!-- button is displayed here when it is the player's turn -->
+      <div class='clickBttn'>DONE</div>
+    </div>
     <?php
       if (isset($_SESSION['message'])) {
         echo($_SESSION['message']);

@@ -19,6 +19,7 @@
     exit;
   }
 
+  // To add the invited player to the party
   if (isset($_POST['addPlayer'])) {
     // Makes sure that at least a username is included
     if ($_POST['username'] == '') {
@@ -35,6 +36,22 @@
         ':gi'=>$getGameId
       ));
       $userId = $pdo->lastInsertId();
+      // Adds the new player to the JSON file that lists the party members
+      $fromOldFile = file_get_contents('../game/json/game_'.$getGameId.'/player_'.$getGameId.'.json');
+      $oldFileList = json_decode($fromOldFile, true);
+      $addedPlayer = new stdClass();
+      $addedPlayer->player_id = $userId;
+      $addedPlayer->username = htmlentities($_POST['username']);
+      $addedPlayer->first_name = htmlentities($_POST['firstName']);
+      $addedPlayer->last_name = htmlentities($_POST['lastName']);
+      $addedPlayer->alive = "1";
+      $addedPlayer->skips_left = "0";
+      $addedPlayer->is_shop = "0";
+      $addedPlayer->game_id = $getGameId;
+      $oldFileList[] = $addedPlayer;
+      $newFileList = json_encode($oldFileList);
+      file_put_contents('../game/json/game_'.$getGameId.'/player_'.$getGameId.'.json', $newFileList);
+      // Finally, sets up their player in their browser and sends them into the game
       $_SESSION['player_id'] = $userId;
       $_SESSION['message'] = "<div style='color:green'>Welcome to the party, ".htmlentities($_POST['username'])."</div>";
       header("Location: ../game/game.php?token=".$_GET['token']);

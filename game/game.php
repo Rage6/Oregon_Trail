@@ -33,10 +33,10 @@
     </div>
     <div>Current Player: <span id="currentName"></span></div>
     <div id="playerStatus"></div>
-    <div class="clickBox">
+    <form id="nextTurn" class="nextTurn">
       <!-- button is displayed here when it is the player's turn -->
-      <div class='clickBttn'>DONE</div>
-    </div>
+      <button type="submit" class='clickBttn'>DONE</button>
+    </form>
     <?php
       if (isset($_SESSION['message'])) {
         echo($_SESSION['message']);
@@ -68,15 +68,16 @@
 
   </body>
   <script>
-  // $(()=>{
-  $(document).ready(()=>{
+  $(()=>{
+  // $(document).ready(()=>{
 
     const gameId = $("body").attr("data-game");
     const gameUrl = "json/game_" + gameId + "/game_" + gameId + ".json";
     const playerUrl = "json/game_" + gameId + "/player_" + gameId + ".json";
-    const currentPlyUrl = "../game/game.php";
+    const currentPlyUrl = "game.php?token=<?php echo($_GET['token']); ?>";
 
-    let currentPlayer = $("body").attr("data-player");
+    let thisPlayer = $("body").attr("data-player");
+    let gameData = null;
 
     // Opens, closes the 'Party Leader' options
     const openOrClose = (box) => {
@@ -110,10 +111,11 @@
       gameRequest.open('GET', gameUrl, true);
       gameRequest.onload = () => {
         if (gameRequest.status == 200) {
-          let gameData = JSON.parse(gameRequest.responseText);
+          gameData = JSON.parse(gameRequest.responseText);
+          console.log(gameData);
           // The below if/else determines whether to display the .clickBttn option  or not based on whether the current player's id (in JSON) is the same as their player id (in a data attribute in their HTML)
-          if (gameData[0]["current_player"] == currentPlayer) {
-            if ($(".clickBttn").val() == null) {
+          if (gameData[0]["current_player"] == thisPlayer) {
+            if ($(".clickBttn").css('display') == "none") {
               $("#playerStatus").text("It is your turn");
               $(".clickBttn").css("display","block");
             };
@@ -142,20 +144,23 @@
       playerRequest.send();
     };
 
-    $(".clickBttn").click((e)=>{
-      console.log(gameId);
-      // e.preventDefault();
+    const switchPlayer = (e)=>{
+      e.preventDefault();
       // let gameJsonUrl = "json/game_" + gameId + "/game_" + gameId + ".json";
-      // let playerParam = "playerId=" + currentPlayer;
-      // let turnRequest = new XMLHttpRequest();
-      // turnRequest.open('POST',currentPlyUrl,true);
-      // turnRequest.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-      // turnRequest.onload = () => {
-      //   console.log("turnRequest worked");
-      // };
-      // turnRequest.send(playerParam);
-      // // ...and the next player becomes the current player.
-    });
+      let playerParam = "player=" + gameData[0]["current_player"];
+      console.log(playerParam);
+      let turnRequest = new XMLHttpRequest();
+      turnRequest.onload = () => {
+        console.log("onload on switchPlayer");
+      };
+      turnRequest.open('POST',currentPlyUrl,true);
+      turnRequest.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+      turnRequest.send(playerParam);
+      // ...and the next player becomes the current player.
+    };
+
+    // $(".clickBttn").click(switchPlayer);
+    document.getElementById('nextTurn').addEventListener('submit',switchPlayer);
 
     // Initial data check
     checkCurrentData();

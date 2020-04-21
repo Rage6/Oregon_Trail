@@ -122,7 +122,7 @@
     // Third, use the updated dB to update the JSON file
     $gameJsonFile = file_get_contents("json/game_".$getGameId."/game_".$getGameId.".json");
     $decodedGameJson = json_decode($gameJsonFile, true);
-    $decodedGameJson[0]["current_player"] = $nextPlayerId;
+    $decodedGameJson[0]["current_player"] = strval($nextPlayerId);
     $updatedGameJson = json_encode($decodedGameJson);
     file_put_contents("json/game_".$getGameId."/game_".$getGameId.".json",$updatedGameJson);
     header("Location: game.php?token=".$_GET['token']);

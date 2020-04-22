@@ -1,0 +1,29 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  background-image: url('../../images/old-barn-wood.jpg');
+  background-position: center;
+  background-size: cover;
+}
+
+.inviteBox {
+  background-color: orange;
+}
+
+.ldrOpt {
+  background-color: orange;
+}
+
+.ldrOptBox {
+  display: none;
+}
+
+.endBox {
+  display: none;
+}
+
+.ifStarted {
+  display: none;
+  background-color: lightblue;
+}

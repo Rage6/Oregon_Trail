@@ -138,7 +138,8 @@
     // Requests Player update from JSON
     const playerRequest = (gmData) => {
       let playerRequest = new XMLHttpRequest();
-      playerRequest.open('GET', playerUrl, true);
+      let playerUrlWithTime = playerUrl + "?time=" + Date.now();
+      playerRequest.open('GET', playerUrlWithTime, true);
       playerRequest.onload = () => {
         if (playerRequest.status == 200) {
           let playerData = JSON.parse(playerRequest.responseText);
@@ -156,7 +157,8 @@
     const checkCurrentData = () => {
       // This gets current Game information...
       let gameRequest = new XMLHttpRequest();
-      gameRequest.open('GET', gameUrl, true);
+      let gameUrlWithTime = gameUrl + "?time=" + Date.now();
+      gameRequest.open('GET', gameUrlWithTime, true);
       gameRequest.onload = () => {
         if (gameRequest.status == 200) {
           gameData = JSON.parse(gameRequest.responseText);
@@ -177,7 +179,7 @@
       console.log(playerParam);
       let turnRequest = new XMLHttpRequest();
       turnRequest.onload = () => {
-        console.log("onload on switchPlayer");
+        // console.log("onload on switchPlayer");
       };
       turnRequest.open('POST',currentPlyUrl,true);
       turnRequest.setRequestHeader('Content-type','application/x-www-form-urlencoded');

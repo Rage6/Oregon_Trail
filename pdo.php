@@ -7,7 +7,7 @@
     $pdo = new PDO('mysql:host=localhost;port=8888;dbname=Oregon_Trail','Nick','Ike');
   } else {
     $isLocal = false;
-    $pdo = new PDO('mysql:us-cdbr-iron-east-01.cleardb.net;port=3306;dbname=heroku_a1c8419498096ac','446f56c4','*passwrd_goes_here*');
+    $pdo = new PDO('mysql:us-cdbr-iron-east-01.cleardb.net;port=3306;dbname=heroku_a1c8419498096ac','b69578920b8ccd','');
   };
 
 ?>

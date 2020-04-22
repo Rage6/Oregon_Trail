@@ -1,14 +1,63 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  background-image: url('../images/old-barn-wood.jpg');
+  background-position: center;
+  background-size: cover;
+}
+
+.mainBody {
+
+}
+
 .headTitle {
-  color: red;
+  margin: 30px 10% 0 10%;
+  padding: 30px 0;
+  color: white;
+  font-size: 3rem;
+  text-align: center;
+  background-color: orange;
+}
+
+.headSubtitle {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.message {
+  margin: 10px 20% 0 20%;
+  border: 5px solid white;
+  padding: 10px 0;
+  color: white;
+  text-align: center;
+  background-color: brown;
 }
 
 .newGameBttn {
+  margin: 20px 10% 0 10%;
+  border: 1px solid white;
+  padding: 10px 0;
+  color: white;
+  text-align: center;
+  font-size: 1.5rem;
+  background-color: green;
+}
+
+.newGameBox {
+  margin: 0 10%;
+  border: 1px solid white;
+  border-top: none;
+  display: none;
   background-color: green;
   color: white;
 }
 
-.newGameBox {
-  display: none;
-  background-color: green;
+.instructionBox {
+  margin: 30px 10% 0 10%;
+  border: 1px solid white;
+  padding: 5%;
   color: white;
+  background-color: black;
 }

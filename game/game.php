@@ -19,37 +19,35 @@
     <!-- <script src="js/main.js"></script> -->
   </head>
   <body data-game="<?php echo($getGameId) ?>" data-player="<?php echo($_SESSION['player_id']) ?>">
-    <?php
-      if ($partyHead == true) {
-        echo("
-          <div>
-            Invitation Link: ".$currentHost."/Oregon_Trail/game/game.php?token=".htmlentities($_GET['token'])."
-          </div>
-        ");
-      };
-    ?>
-    <div>
-      The game starts now.
+    <div class='ifStarted'>
+      <div>Current Player: <span id="currentName"></span></div>
+      <div id="playerStatus"></div>
+      <form id="nextTurn" class="nextTurn">
+        <!-- button is displayed here when it is the player's turn -->
+        <button type="submit" class='clickBttn'>DONE</button>
+      </form>
+      <?php
+        if (isset($_SESSION['message'])) {
+          echo($_SESSION['message']);
+          // echo("<pre>");
+          // var_dump($_SESSION['message']);
+          // echo("</pre>");
+          unset($_SESSION['message']);
+        };
+      ?>
     </div>
-    <div>Current Player: <span id="currentName"></span></div>
-    <div id="playerStatus"></div>
-    <form id="nextTurn" class="nextTurn">
-      <!-- button is displayed here when it is the player's turn -->
-      <button type="submit" class='clickBttn'>DONE</button>
-    </form>
     <?php
-      if (isset($_SESSION['message'])) {
-        echo($_SESSION['message']);
-        // echo("<pre>");
-        // var_dump($_SESSION['message']);
-        // echo("</pre>");
-        unset($_SESSION['message']);
-      };
       if ($partyHead == true) {
         echo("
-          <div>
+          <div class='ldrOpt'>
             <div id='ldrOptBttn' class='ldrOptBttn'>Party Leader Options</div>
             <div id='ldrOptBox' class='ldrOptBox'>
+              <div class='inviteBox'>
+                <div id='inviteBttn'>COPY LINK</div>
+                <div id='inviteLink'>
+                  ".$currentHost."/Oregon_Trail/game/game.php?token=".htmlentities($_GET['token'])."
+                </div>
+              </div>
               <div id='endBttn' class='endBttn'>END GAME</div>
               <div id='endBox' class='endBox'>
                 Are you sure that you want to end your trail now? ALL of your party members and your party's progress will end!
@@ -65,7 +63,6 @@
         ");
       }
     ?>
-
   </body>
   <script>
   $(()=>{
@@ -77,7 +74,7 @@
     const currentPlyUrl = "game.php?token=<?php echo($_GET['token']); ?>";
 
     let thisPlayer = $("body").attr("data-player");
-    let gameData = null;
+    let currentGameData = null;
 
     // Opens, closes the 'Party Leader' options
     const openOrClose = (box) => {
@@ -104,38 +101,44 @@
       intervalTool = setInterval(checkCurrentData, 5000);
     };
 
-    // Function for retrieving necessary Player and Game data
-    const checkCurrentData = () => {
-      // This gets current Game information...
-      let gameRequest = new XMLHttpRequest();
-      gameRequest.open('GET', gameUrl, true);
-      gameRequest.onload = () => {
-        if (gameRequest.status == 200) {
-          gameData = JSON.parse(gameRequest.responseText);
-          console.log(gameData);
-          // The below if/else determines whether to display the .clickBttn option  or not based on whether the current player's id (in JSON) is the same as their player id (in a data attribute in their HTML)
-          if (gameData[0]["current_player"] == thisPlayer) {
-            if ($(".clickBttn").css('display') == "none") {
-              $("#playerStatus").text("It is your turn");
-              $(".clickBttn").css("display","block");
-            };
-          } else {
-            $("#playerStatus").empty();
-            $(".clickBttn").css("display","none");
-          };
+    // Uses the updated Game data
+    const gmUpdateScreen = (gmData) => {
+      if (gmData[0]['active'] == "1") {
+        $(".ifStarted").css("display","block");
+      } else {
+        $(".ifStarted").css("display","none");
+      };
+      // The below if/else determines whether to display the .clickBttn option  or not based on whether the current player's id (in JSON) is the same as their player id (in a data attribute in their HTML)
+      if (gmData[0]["current_player"] == thisPlayer) {
+        if ($(".clickBttn").css('display') == "none") {
+          $("#playerStatus").text("It is your turn");
+          $(".clickBttn").css("display","block");
+        };
+      } else {
+        $("#playerStatus").empty();
+        $(".clickBttn").css("display","none");
+      };
+    };
+
+    // Uses the updated Player data
+    const plyUpdateScreen = (plyData,gmeData) => {
+      for (userNum = 0; userNum < plyData.length; userNum++) {
+        if (plyData[userNum]["player_id"] == gmeData[0]["current_player"]) {
+          $("#currentName").text(plyData[userNum]["username"]);
         };
       };
-      gameRequest.onerror = () => {
-        console.log("An error occurred in gameData");
-      };
-      gameRequest.send();
-      // This gets current Player information
+      gmUpdateScreen(gmeData);
+    };
+
+    // Requests Player update from JSON
+    const playerRequest = (gmData) => {
       let playerRequest = new XMLHttpRequest();
       playerRequest.open('GET', playerUrl, true);
       playerRequest.onload = () => {
         if (playerRequest.status == 200) {
           let playerData = JSON.parse(playerRequest.responseText);
           console.log(playerData);
+          plyUpdateScreen(playerData,gmData);
         };
       };
       playerRequest.onerror = () => {
@@ -144,9 +147,27 @@
       playerRequest.send();
     };
 
+    // Function for retrieving necessary Player and Game data
+    const checkCurrentData = () => {
+      // This gets current Game information...
+      let gameRequest = new XMLHttpRequest();
+      gameRequest.open('GET', gameUrl, true);
+      gameRequest.onload = () => {
+        if (gameRequest.status == 200) {
+          gameData = JSON.parse(gameRequest.responseText);
+          currentGameData = gameData;
+          console.log(gameData);
+          playerRequest(gameData);
+        };
+      };
+      gameRequest.onerror = () => {
+        console.log("An error occurred in gameData");
+      };
+      gameRequest.send();
+    };
+
     const switchPlayer = (e)=>{
       e.preventDefault();
-      // let gameJsonUrl = "json/game_" + gameId + "/game_" + gameId + ".json";
       let playerParam = "player=" + gameData[0]["current_player"];
       console.log(playerParam);
       let turnRequest = new XMLHttpRequest();

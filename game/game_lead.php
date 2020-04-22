@@ -22,7 +22,7 @@
   // To retrieve a game_id based on the token in the URL
   if (isset($_GET['token'])) {
     if ($getGameInfo == false) {
-      $_SESSION['message'] = "<div style='color:red'>The link that you used was either invalid or no longer in use. Please contact your party leader for the current party's link.</div>";
+      $_SESSION['message'] = "<div class='message'>The link that you used was either invalid or no longer in use. Please contact your party leader for the current party's link.</div>";
       header("Location: ../index.php?invalid=true");
       exit;
     };
@@ -31,7 +31,7 @@
     // var_dump($getGameId);
     // echo("</pre>");
   } else {
-    $_SESSION['message'] = "<div style='color:red'>Your link did not include a required token. Talk to your party leader for a completed link.</div>";
+    $_SESSION['message'] = "<div class='message'>Your link did not include a required token. Talk to your party leader for a completed link.</div>";
     header("Location: ../index.php");
     exit;
   };
@@ -60,7 +60,7 @@
       $getPartyHead = $getPartyHeadStmt->fetch(PDO::FETCH_ASSOC)['party_head'];
       if ($_SESSION['player_id'] != $getPartyHead) {
         $_SESSION['message'] = "
-          <div style='color:red'>
+          <div class='message'>
             According to our records, you are not a member of ".$getGameInfo['party_name'].". To join it, click
             <form method='POST'>
               <input type='submit' name='resetCharacter' value='HERE' />
@@ -72,7 +72,7 @@
         exit;
       } else {
         $_SESSION['message'] = "
-          <div style='color:red'>
+          <div class='message'>
             According to our records, you are currently the Party Leader of another game. Therefore, you cannot join another party until your current game ends.
           </div>";
         header("Location: ../index.php");
@@ -146,7 +146,7 @@
       unlink($oneFile);
     };
     rmdir($folderPath);
-    $_SESSION['message'] = "<div style='color:blue'>Your game is now deleted.</div>";
+    $_SESSION['message'] = "<div class='message'>Your game is now deleted.</div>";
     header("Location: ../index.php");
     exit;
   };

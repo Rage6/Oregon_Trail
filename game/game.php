@@ -38,6 +38,11 @@
     </div>
     <?php
       if ($partyHead == true) {
+        if ($isLocal == true) {
+          $localAttachment = "Oregon_Trail/";
+        } else {
+          $localAttachment = "";
+        };
         echo("
           <div class='ldrOpt'>
             <div id='ldrOptBttn' class='ldrOptBttn'>Party Leader Options</div>
@@ -45,7 +50,7 @@
               <div class='inviteBox'>
                 <div id='inviteBttn'>COPY LINK</div>
                 <div id='inviteLink'>
-                  ".$currentHost."/Oregon_Trail/game/game.php?token=".htmlentities($_GET['token'])."
+                  ".$currentHost."/".$localAttachment."game/game.php?token=".htmlentities($_GET['token'])."
                 </div>
               </div>
               <div id='endBttn' class='endBttn'>END GAME</div>

@@ -84,6 +84,35 @@
     exit;
   };
 
+  // Starts the game after all members joined
+  if (isset($_POST['startTrail'])) {
+    $currentCountStmt = $pdo->prepare("SELECT COUNT(player_id) FROM Player WHERE game_id=:gd");
+    $currentCountStmt->execute(array(
+      ':gd'=>$getGameId
+    ));
+    $currentCount = (int)$currentCountStmt->fetch(PDO::FETCH_ASSOC)["COUNT(player_id)"];
+    if ((int)$getGameInfo['party_size'] == $currentCount) {
+      // Mark the game 'active' in the dB
+      $activateStmt = $pdo->prepare("UPDATE Game SET active=1 WHERE game_id=:gid");
+      $activateStmt->execute(array(
+        ':gid'=>$getGameId
+      ));
+      // Use the updated dB to "activate" in the JSON file
+      $inactiveJsonFile = file_get_contents("json/game_".$getGameId."/game_".$getGameId.".json");
+      $decodedInactiveJson = json_decode($inactiveJsonFile, true);
+      $decodedInactiveJson[0]["active"] = "1";
+      $activateGameJson = json_encode($decodedInactiveJson);
+      file_put_contents("json/game_".$getGameId."/game_".$getGameId.".json",$activateGameJson);
+      $_SESSION['message'] = "<div style='color:white;background-color:green'>Your travel has begun!</div>";
+      header("Location: game.php?token=".$_GET['token']);
+      exit;
+    } else {
+      $_SESSION['message'] = "<div style='color:red;background-color:white'>You planned to have ".(int)$getGameInfo['party_size']." party members, but only ".$currentCount." is/are present. You can wait for your remaining member(s), or end this game to start a new one with the desired party size.</div>";
+      header("Location: game.php?token=".$_GET['token']);
+      exit;
+    };
+  };
+
   // Turn the next player into the current player
   if (isset($_POST['player'])) {
     // First, identify the next player's id number

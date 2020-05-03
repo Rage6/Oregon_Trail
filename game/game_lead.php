@@ -84,6 +84,15 @@
     exit;
   };
 
+  $thisPlayerInfoStmt = $pdo->prepare("SELECT * FROM Player WHERE Player.player_id=:pid");
+  $thisPlayerInfoStmt->execute(array(
+    ':pid'=>htmlentities($_SESSION['player_id'])
+  ));
+  $thisPlayerInfo = [];
+  while ($onePlayerInfo = $thisPlayerInfoStmt->fetch(PDO::FETCH_ASSOC)) {
+    $thisPlayerInfo[] = $onePlayerInfo;
+  };
+
   // Starts the game after all members joined
   if (isset($_POST['startTrail'])) {
     $currentCountStmt = $pdo->prepare("SELECT COUNT(player_id) FROM Player WHERE game_id=:gd");

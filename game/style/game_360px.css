@@ -23,6 +23,18 @@ body {
   display: none;
 }
 
+.playerInfoBttn {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  background-color: lightblue;
+  text-align: center;
+}
+
+.playerInfoBox {
+  display: none;
+}
+
 .ifStarted {
   display: none;
   background-color: lightblue;

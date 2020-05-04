@@ -19,56 +19,68 @@
     <!-- <script src="js/main.js"></script> -->
   </head>
   <body data-game="<?php echo($getGameId) ?>" data-player="<?php echo($_SESSION['player_id']) ?>">
+    <?php
+      if ($partyHead == true) {
+        if ($isLocal == true) {
+          $localAttachment = "Oregon_Trail/";
+        } else {
+          $localAttachment = "";
+        };
+        echo("
+          <div class='ldrOpt'>
+          </div>
+          <div id='ldrOptBox' class='ldrOptBox'>
+            <div class='inviteBox'>
+              <div id='inviteBttn'>COPY LINK</div>
+              <div id='inviteLink' class='inviteLink'>
+                ".$currentHost."/".$localAttachment."game/game.php?token=".htmlentities($_GET['token'])."
+              </div>
+            </div>
+            <div class='startBttn'>START TRAIL?</div>");
+          if ((int)$getGameInfo['active'] == 0) {
+            echo("
+            <div class='startBox'>
+              Ready to go? No one else can join your party after hitting the trail.
+              <form method='POST'>
+                <input type='hidden' name='token' value='".$_GET['token']."'/>
+                <input type='submit' name='startTrail' value='START' />
+              </form>
+            </div>");
+          };
+            echo("
+            <div id='endBttn' class='endBttn'>END GAME</div>
+            <div id='endBox' class='endBox'>
+              Are you sure that you want to end your trail now? ALL of your party members and your party's progress will end!
+              <div>
+                <form method='POST'>
+                  <input type='submit' name='deleteGame' value='YES, END OUR TRAIL' />
+                </form>
+                <div>NO, CONTINUE OUR JOURNEY</div>
+              </div>
+            </div>
+          </div>
+        ");
+      }
+    ?>
     <div class="playerInfo">
       <div class="playerInfoBttn" id="playerInfoBttn">
         <?php echo("<div>".$thisPlayerInfo[0]["username"]."</div>") ?>
         <div id="healthStatus"></div>
       </div>
       <div class="playerInfoBox" id="playerInfoBox">
-        <?php
-          if ($partyHead == true) {
-            if ($isLocal == true) {
-              $localAttachment = "Oregon_Trail/";
-            } else {
-              $localAttachment = "";
+        <div class="playerInfoContent">
+          Full Name: <?php echo($thisPlayerInfo[0]["first_name"]." ".$thisPlayerInfo[0]["last_name"]) ?>
+          <?php
+            if ($partyHead == true) {
+              if ($isLocal == true) {
+                $localAttachment = "Oregon_Trail/";
+              } else {
+                $localAttachment = "";
+              };
+              echo("<div id='ldrOptBttn' class='ldrOptBttn'>Party Leader Options</div>");
             };
-            echo("
-              <div class='ldrOpt'>
-                <div id='ldrOptBttn' class='ldrOptBttn'>Party Leader Options</div>
-                <div id='ldrOptBox' class='ldrOptBox'>
-                  <div class='inviteBox'>
-                    <div id='inviteBttn'>COPY LINK</div>
-                    <div id='inviteLink'>
-                      ".$currentHost."/".$localAttachment."game/game.php?token=".htmlentities($_GET['token'])."
-                    </div>
-                  </div>
-                  <div class='startBttn'>START TRAIL?</div>");
-                if ((int)$getGameInfo['active'] == 0) {
-                  echo("
-                  <div class='startBox'>
-                    Ready to go? No one else can join your party after hitting the trail.
-                    <form method='POST'>
-                      <input type='hidden' name='token' value='".$_GET['token']."'/>
-                      <input type='submit' name='startTrail' value='START' />
-                    </form>
-                  </div>");
-                };
-                  echo("
-                  <div id='endBttn' class='endBttn'>END GAME</div>
-                  <div id='endBox' class='endBox'>
-                    Are you sure that you want to end your trail now? ALL of your party members and your party's progress will end!
-                    <div>
-                      <form method='POST'>
-                        <input type='submit' name='deleteGame' value='YES, END OUR TRAIL' />
-                      </form>
-                      <div>NO, CONTINUE OUR JOURNEY</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ");
-          }
-        ?>
+          ?>
+        </div>
       </div>
     </div>
     <?php
@@ -118,6 +130,7 @@
 
     // Opens, closes the 'Party Leader' options
     $("#ldrOptBttn").click(()=>{
+      openOrClose(".ldrOpt");
       openOrClose(".ldrOptBox");
     });
 

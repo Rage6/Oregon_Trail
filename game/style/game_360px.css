@@ -7,16 +7,37 @@ body {
   background-size: cover;
 }
 
-.inviteBox {
-  background-color: orange;
-}
-
 .ldrOpt {
-  background-color: orange;
+  display: none;
+  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.5);
+  height: 100%;
 }
 
 .ldrOptBox {
+  margin-top: 125px;
+  margin-left: 3%;
+  padding: 10px 2%;
   display: none;
+  position: fixed;
+  z-index: 3;
+  background-color: orange;
+  width: 90%;
+}
+
+.inviteBox {
+  margin-bottom: 20px;
+  color: white;
+  background-color: green;
+}
+
+.inviteLink {
+  overflow-x: scroll;
+  white-space: nowrap;
+}
+
+.endBttn {
+  margin-top: 20px;
 }
 
 .endBox {
@@ -32,7 +53,14 @@ body {
 }
 
 .playerInfoBox {
+  padding: 10px;
   display: none;
+  color: white;
+  background-color: blue;
+}
+
+.playerInfoContent {
+
 }
 
 .ifStarted {

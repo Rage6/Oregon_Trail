@@ -7,41 +7,92 @@ body {
   background-size: cover;
 }
 
-.ldrOpt {
-  display: none;
-  z-index: 2;
-  background-color: rgba(0, 0, 0, 0.5);
-  height: 100%;
-}
-
 .ldrOptBox {
   margin-top: 125px;
   margin-left: 3%;
   padding: 10px 2%;
-  display: none;
+  /* display: none; */
   position: fixed;
-  z-index: 3;
   background-color: orange;
   width: 90%;
 }
 
+.inviteBttn {
+  margin: 0 25% 20px 25%;
+  border: 2px solid white;
+  border-radius: 15px;
+  color: green;
+  font-size: 1.5rem;
+  text-align: center;
+  background-color: white;
+  width: 50%;
+}
+
 .inviteBox {
   margin-bottom: 20px;
+  padding: 10px 1%;
   color: white;
-  background-color: green;
+  background-color: darkgreen;
 }
 
 .inviteLink {
+  border: 1px solid white;
+  padding: 5px 2%;
   overflow-x: scroll;
   white-space: nowrap;
 }
 
+.startBox {
+  padding: 10px 5%;
+  color: white;
+  background-color: darkgreen;
+}
+
+.followBox {
+  margin-top: 125px;
+  margin-left: 3%;
+  padding: 10px 2%;
+  position: fixed;
+  background-color: orange;
+  width: 90%;
+}
+
+.startFollowBox {
+  padding: 10px 5%;
+  color: white;
+  background-color: darkgreen;
+}
+
+.startBttn {
+  margin-bottom: 10px;
+  text-align: center;
+  text-decoration: underline;
+}
+
+.startForm {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.startForm input {
+  border: 2px solid white;
+  border-radius: 15px;
+  font-size: 1.3rem;
+  background-color: blue;
+  color: white;
+}
+
 .endBttn {
   margin-top: 20px;
+  color: white;
+  text-align: center;
+  background-color: red;
 }
 
 .endBox {
   display: none;
+  color: white;
+  background-color: darkred;
 }
 
 .playerInfoBttn {

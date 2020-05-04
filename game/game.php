@@ -27,45 +27,68 @@
           $localAttachment = "";
         };
         echo("
-          <div class='ldrOpt'>
-          </div>
           <div id='ldrOptBox' class='ldrOptBox'>
             <div class='inviteBox'>
-              <div id='inviteBttn'>COPY LINK</div>
+              <div id='inviteBttn' class='inviteBttn'>
+                COPY LINK
+              </div>
               <div id='inviteLink' class='inviteLink'>
                 ".$currentHost."/".$localAttachment."game/game.php?token=".htmlentities($_GET['token'])."
               </div>
             </div>
-            <div class='startBttn'>START TRAIL?</div>");
-          if ((int)$getGameInfo['active'] == 0) {
-            echo("
             <div class='startBox'>
-              Ready to go? No one else can join your party after hitting the trail.
-              <form method='POST'>
-                <input type='hidden' name='token' value='".$_GET['token']."'/>
-                <input type='submit' name='startTrail' value='START' />
-              </form>
+              <div class='startBttn'>
+                START TRAIL
+              </div>
+              <div>
+                Players:
+              </div>
+              <div id='playerList' class='playerList'>
+              </div>");
+          if ((int)$getGameInfo['active'] == "0") {
+            echo("
+              <div class='startContent'>
+                Ready to go? No one else can join your party after hitting the trail.
+                <form method='POST' class='startForm'>
+                  <input type='hidden' name='token' value='".$_GET['token']."'/>
+                  <input type='submit' name='startTrail' value='START' />
+                </form>
+              </div>
             </div>");
           };
             echo("
-            <div id='endBttn' class='endBttn'>END GAME</div>
+            <div id='endBttn' class='endBttn'>
+              END GAME
+            </div>
             <div id='endBox' class='endBox'>
               Are you sure that you want to end your trail now? ALL of your party members and your party's progress will end!
               <div>
                 <form method='POST'>
                   <input type='submit' name='deleteGame' value='YES, END OUR TRAIL' />
                 </form>
-                <div>NO, CONTINUE OUR JOURNEY</div>
+                <div>
+                  NO, CONTINUE OUR JOURNEY
+                </div>
               </div>
             </div>
           </div>
         ");
-      }
+      } else {
+        echo("
+          <div class='followBox'>
+            <div class='startFollowBox'>
+              <div>Players:</div>
+              <div id='playerList' class='playerList'></div>
+            </div>
+          </div>
+        ");
+      };
     ?>
     <div class="playerInfo">
       <div class="playerInfoBttn" id="playerInfoBttn">
         <?php echo("<div>".$thisPlayerInfo[0]["username"]."</div>") ?>
-        <div id="healthStatus"></div>
+        <div id="healthStatus">
+        </div>
       </div>
       <div class="playerInfoBox" id="playerInfoBox">
         <div class="playerInfoContent">
@@ -94,11 +117,16 @@
       // echo("<pre>".var_dump($thisPlayerInfo)."</pre>")
     ?>
     <div class='ifStarted'>
-      <div>Current Player: <span id="currentName"></span></div>
-      <div id="playerStatus"></div>
+      <div>
+        Current Player: <span id="currentName"></span>
+      </div>
+      <div id="playerStatus">
+      </div>
       <form id="nextTurn" class="nextTurn">
         <!-- button is displayed here when it is the player's turn -->
-        <button type="submit" class='clickBttn'>DONE</button>
+        <button type="submit" class='clickBttn'>
+          DONE
+        </button>
       </form>
     </div>
   </body>
@@ -150,7 +178,8 @@
       if (gmData[0]['active'] == "1") {
         $(".ifStarted").css("display","block");
         $(".startBox").css("display","none");
-        $(".startBttn").css("display","none");
+        $(".followBox").css("display","none");
+        // $(".startBttn").css("display","none");
       } else {
         $(".ifStarted").css("display","none");
       };
@@ -168,7 +197,13 @@
 
     // Uses the updated Player data
     const plyUpdateScreen = (plyData,gmeData) => {
+      if (gmeData[0]["active"] == "0") {
+        $("#playerList").empty();
+      };
       for (userNum = 0; userNum < plyData.length; userNum++) {
+        if (gmeData[0]["active"] == "0") {
+          $("#playerList").append("<div>"+plyData[userNum]["username"]+" ("+plyData[userNum]["first_name"]+" "+plyData[userNum]["last_name"]+")</div>");
+        };
         // Shows who the current player is
         if (plyData[userNum]["player_id"] == gmeData[0]["current_player"]) {
           $("#currentName").text(plyData[userNum]["username"]);

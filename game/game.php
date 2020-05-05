@@ -36,19 +36,20 @@
                 ".$currentHost."/".$localAttachment."game/game.php?token=".htmlentities($_GET['token'])."
               </div>
             </div>
+
+              <div>
+                Players:
+              </div>
+              <div class='playerList'>
+              </div>");
+          if ((int)$getGameInfo['active'] == "0") {
+            echo("
             <div class='startBox'>
               <div class='startBttn'>
                 START TRAIL
               </div>
-              <div>
-                Players:
-              </div>
-              <div id='playerList' class='playerList'>
-              </div>");
-          if ((int)$getGameInfo['active'] == "0") {
-            echo("
               <div class='startContent'>
-                Ready to go? No one else can join your party after hitting the trail.
+                Once the chosen number of members have joined your party, click 'START' and hit the trail.
                 <form method='POST' class='startForm'>
                   <input type='hidden' name='token' value='".$_GET['token']."'/>
                   <input type='submit' name='startTrail' value='START' />
@@ -57,6 +58,7 @@
             </div>");
           };
             echo("
+
             <div id='endBttn' class='endBttn'>
               END GAME
             </div>
@@ -78,7 +80,7 @@
           <div class='followBox'>
             <div class='startFollowBox'>
               <div>Players:</div>
-              <div id='playerList' class='playerList'></div>
+              <div class='playerList'></div>
             </div>
           </div>
         ");
@@ -173,12 +175,19 @@
       intervalTool = setInterval(checkCurrentData, 5000);
     };
 
+    // To mark this as the first run on the interval cycle
+    let firstRun = true;
+
     // Uses the updated Game data
     const gmUpdateScreen = (gmData) => {
       if (gmData[0]['active'] == "1") {
         $(".ifStarted").css("display","block");
         $(".startBox").css("display","none");
         $(".followBox").css("display","none");
+        if (firstRun == true) {
+          $(".ldrOptBox").css("display","none");
+          firstRun = false;
+        };
         // $(".startBttn").css("display","none");
       } else {
         $(".ifStarted").css("display","none");
@@ -197,13 +206,9 @@
 
     // Uses the updated Player data
     const plyUpdateScreen = (plyData,gmeData) => {
-      if (gmeData[0]["active"] == "0") {
-        $("#playerList").empty();
-      };
+      $(".playerList").empty();
       for (userNum = 0; userNum < plyData.length; userNum++) {
-        if (gmeData[0]["active"] == "0") {
-          $("#playerList").append("<div>"+plyData[userNum]["username"]+" ("+plyData[userNum]["first_name"]+" "+plyData[userNum]["last_name"]+")</div>");
-        };
+        $(".playerList").append("<div>"+plyData[userNum]["username"]+" ("+plyData[userNum]["first_name"]+" "+plyData[userNum]["last_name"]+")</div>");
         // Shows who the current player is
         if (plyData[userNum]["player_id"] == gmeData[0]["current_player"]) {
           $("#currentName").text(plyData[userNum]["username"]);
@@ -278,6 +283,11 @@
 
     // Initial data check
     checkCurrentData();
+
+    // // Closes the Leader Options after starting the game
+    // if (currentGameData[0]['active'] == "1") {
+    //   $(".ldrOptBox").css("display","none");
+    // };
 
     // Runs the data checks every 5 seconds
     runIntervalTool();

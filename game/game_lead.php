@@ -122,8 +122,25 @@
     };
   };
 
+  // This function is a) carried out within the 'player' POST (see below) and b) only happens if a trail card was used.
+  function trailCardUse($pdoParam,$thisGameId) {
+    $oneLessStmt = $pdoParam->prepare("UPDATE Game SET until_end = until_end - 1 WHERE game_id=:gm");
+    $oneLessStmt->execute(array(
+      ':gm'=>$thisGameId
+    ));
+    $trailLeftStmt = $pdoParam->prepare("SELECT until_end FROM Game WHERE game_id=:ga");
+    $trailLeftStmt->execute(array(
+      ':ga'=>$thisGameId
+    ));
+    $trailLeft = $trailLeftStmt->fetch(PDO::FETCH_ASSOC);
+    return $trailLeft;
+  };
+
   // Turn the next player into the current player
   if (isset($_POST['player'])) {
+    if ($_POST['action'] == "trail") {
+      $lessTrail = trailCardUse($pdo,$getGameId);
+    };
     // First, identify the next player's id number
     $currentPlayer = (int)htmlentities($_POST['player']);
     $allAliveStmt = $pdo->prepare("SELECT player_id FROM Player WHERE game_id=:gg AND alive=1");
@@ -161,6 +178,7 @@
     $gameJsonFile = file_get_contents("json/game_".$getGameId."/game_".$getGameId.".json");
     $decodedGameJson = json_decode($gameJsonFile, true);
     $decodedGameJson[0]["current_player"] = strval($nextPlayerId);
+    $decodedGameJson[0]["until_end"] = $lessTrail["until_end"];
     $updatedGameJson = json_encode($decodedGameJson);
     file_put_contents("json/game_".$getGameId."/game_".$getGameId.".json",$updatedGameJson);
     header("Location: game.php?token=".$_GET['token']);
@@ -188,6 +206,10 @@
     header("Location: ../index.php");
     exit;
   };
+
+  // To 'kill off' a member (in case they stop playing)
+
+
 
   // echo("<pre>");
   // echo("GET:</br>");

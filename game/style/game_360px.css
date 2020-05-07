@@ -114,7 +114,29 @@ body {
 
 }
 
+.playerList {
+
+}
+
+.playerRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.topRow {
+  border-bottom: 1px solid black;
+}
+
 .ifStarted {
   display: none;
   background-color: lightgreen;
+}
+
+.yourTurnBox {
+  display: none;
+}
+
+.clickBttn {
+  color: white;
+  background-color: green;
 }

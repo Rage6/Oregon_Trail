@@ -36,12 +36,11 @@
                 ".$currentHost."/".$localAttachment."game/game.php?token=".htmlentities($_GET['token'])."
               </div>
             </div>
-
-              <div>
-                Players:
-              </div>
-              <div class='playerList'>
-              </div>");
+            <div>
+              <u>Party Members</u>
+            </div>
+            <div class='playerList'>
+            </div>");
           if ((int)$getGameInfo['active'] == "0") {
             echo("
             <div class='startBox'>
@@ -79,8 +78,12 @@
         echo("
           <div class='followBox'>
             <div class='startFollowBox'>
-              <div>Players:</div>
-              <div class='playerList'></div>
+              <div>
+                <u>Party Members</u>
+              </div>
+              <div class='playerList'>
+              </div>
+              <div>Your travel will begin shortly</div>
             </div>
           </div>
         ");
@@ -94,7 +97,11 @@
       </div>
       <div class="playerInfoBox" id="playerInfoBox">
         <div class="playerInfoContent">
-          Full Name: <?php echo($thisPlayerInfo[0]["first_name"]." ".$thisPlayerInfo[0]["last_name"]) ?>
+          <div>
+            <u>Party Members</u>
+          </div>
+          <div class="playerList">
+          </div>
           <?php
             if ($partyHead == true) {
               if ($isLocal == true) {
@@ -102,7 +109,10 @@
               } else {
                 $localAttachment = "";
               };
-              echo("<div id='ldrOptBttn' class='ldrOptBttn'>Party Leader Options</div>");
+              echo("
+          <div id='ldrOptBttn' class='ldrOptBttn'>
+            Party Leader Options
+          </div>");
             };
           ?>
         </div>
@@ -122,14 +132,23 @@
       <div>
         Current Player: <span id="currentName"></span>
       </div>
+      <div>
+        To Destination: <span id="currentTrail"></span>
+      </div>
       <div id="playerStatus">
       </div>
-      <form id="nextTurn" class="nextTurn">
-        <!-- button is displayed here when it is the player's turn -->
-        <button type="submit" class='clickBttn'>
-          DONE
-        </button>
-      </form>
+      <div class="yourTurnBox">
+        <div style="display:flex;justify-content:space-between">
+          <div id="trailCard">TRAIL CARD</div>
+          <div>SUPPLY CARD</div>
+        </div>
+        <form id="nextTurn" class="nextTurn">
+          <!-- button is displayed here when it is the player's turn -->
+          <button type="submit" class='clickBttn'>
+            DONE
+          </button>
+        </form>
+      </div>
     </div>
   </body>
   <script>
@@ -143,6 +162,8 @@
 
     let thisPlayer = $("body").attr("data-player");
     let currentGameData = null;
+
+    let turnOver = false;
 
     // Opens, closes the 'Party Leader' options
     const openOrClose = (box) => {
@@ -188,27 +209,40 @@
           $(".ldrOptBox").css("display","none");
           firstRun = false;
         };
-        // $(".startBttn").css("display","none");
+        turnOver = false;
+        $(".clickBttn")
+          .css("background-color","green");
       } else {
         $(".ifStarted").css("display","none");
       };
-      // The below if/else determines whether to display the .clickBttn option  or not based on whether the current player's id (in JSON) is the same as their player id (in a data attribute in their HTML)
+      $("#currentTrail").text(gmData[0]["until_end"]);
+      // The below if/else determines whether to display the .yourTurnBox element or not based on whether the current player's id (in JSON) is the same as their player id (in a data attribute in their HTML)
       if (gmData[0]["current_player"] == thisPlayer) {
-        if ($(".clickBttn").css('display') == "none") {
-          $("#playerStatus").text("It is your turn");
-          $(".clickBttn").css("display","block");
+        if ($(".yourTurnBox").css('display') == "none") {
+          // $("#playerStatus").text("It is your turn");
+          $(".yourTurnBox").css("display","block");
         };
       } else {
-        $("#playerStatus").empty();
-        $(".clickBttn").css("display","none");
+        // $("#playerStatus").empty();
+        $(".yourTurnBox").css("display","none");
       };
     };
 
     // Uses the updated Player data
     const plyUpdateScreen = (plyData,gmeData) => {
       $(".playerList").empty();
+      $(".playerList").append("\
+        <div class='playerRow topRow'>\
+          <div>Username</div>\
+          <div>Full Name</div>\
+          <div>Health</div>\
+        </div>");
       for (userNum = 0; userNum < plyData.length; userNum++) {
-        $(".playerList").append("<div>"+plyData[userNum]["username"]+" ("+plyData[userNum]["first_name"]+" "+plyData[userNum]["last_name"]+")</div>");
+        $(".playerList").append("\
+          <div class='playerRow'>\
+            <div>"+plyData[userNum]["username"]+"</div>\ <div>"+plyData[userNum]["first_name"]+" "+plyData[userNum]["last_name"]+"</div>\
+            <div>"+plyData[userNum]["alive"]+"</div>\
+          </div>");
         // Shows who the current player is
         if (plyData[userNum]["player_id"] == gmeData[0]["current_player"]) {
           $("#currentName").text(plyData[userNum]["username"]);
@@ -263,19 +297,37 @@
       gameRequest.send();
     };
 
+    // The cardAction shows whether a trail or supply card is being used
+    cardAction = null;
+    $("#trailCard").click(()=>{
+      cardAction = "trail";
+      console.log("Trail Card selected: " + cardAction);
+    });
+
     // Completes a player's turn and switches to the next player
     const switchPlayer = (e)=>{
       e.preventDefault();
-      let playerParam = "player=" + gameData[0]["current_player"];
-      console.log(playerParam);
-      let turnRequest = new XMLHttpRequest();
-      turnRequest.onload = () => {
-        // console.log("onload on switchPlayer");
+      if (turnOver == false) {
+        let playerParam = "player=" + window.encodeURIComponent(gameData[0]["current_player"]);
+        let actionParam = "&action=" + window.encodeURIComponent(cardAction);
+        let fullParam = playerParam + actionParam;
+        console.log(fullParam);
+        let turnRequest = new XMLHttpRequest();
+        turnRequest.onload = () => {
+          // console.log("onload on switchPlayer");
+        };
+        turnRequest.open('POST',currentPlyUrl,true);
+        turnRequest.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+        turnRequest.send(fullParam);
+        // ...and the next player becomes the current player.
+        // To make sure this function is carried out only once...
+        turnOver = true;
+        cardAction = null;
+        $(".clickBttn")
+          .css("background-color","lightgrey");
+      } else {
+        console.log("It already happened");
       };
-      turnRequest.open('POST',currentPlyUrl,true);
-      turnRequest.setRequestHeader('Content-type','application/x-www-form-urlencoded');
-      turnRequest.send(playerParam);
-      // ...and the next player becomes the current player.
     };
 
     // $(".clickBttn").click(switchPlayer);

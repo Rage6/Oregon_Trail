@@ -75,10 +75,4 @@
       </div>
     </div>
   </body>
-  <script>
-    $(()=>{
-      console.log("With host: " + location.host);
-      console.log("With hostname: " + location.hostname);
-    });
-  </script>
 </html>

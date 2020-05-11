@@ -156,9 +156,19 @@
   // $(document).ready(()=>{
 
     const gameId = $("body").attr("data-game");
-    const gameUrl = "json/game_" + gameId + "/game_" + gameId + ".json";
-    const playerUrl = "json/game_" + gameId + "/player_" + gameId + ".json";
-    const currentPlyUrl = "game.php?token=<?php echo($_GET['token']); ?>";
+    let gameUrl = null;
+    let playerUrl = null;
+    let currentPlyUrl = null;
+    if (location.host == "localhost:8888") {
+      console.log("This went to the local host");
+      gameUrl = "http://localhost:8888/Oregon_Trail/game/json/game_" + gameId + "/game_" + gameId + ".json";
+      playerUrl = "http://localhost:8888/Oregon_Trail/game/json/game_" + gameId + "/player_" + gameId + ".json";
+      currentPlyUrl = "http://localhost:8888/Oregon_Trail/game/game.php?token=<?php echo($_GET['token']); ?>";
+    } else {
+      gameUrl = "https://oregon-trail-card-game.herokuapp.com/game/json/game_" + gameId + "/game_" + gameId + ".json";
+      playerUrl = "https://oregon-trail-card-game.herokuapp.com/game/json/game_" + gameId + "/player_" + gameId + ".json";
+      currentPlyUrl = "https://oregon-trail-card-game.herokuapp.com/game.php?token=<?php echo($_GET['token']); ?>";
+    };
 
     let thisPlayer = $("body").attr("data-player");
     let currentGameData = null;

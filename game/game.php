@@ -165,6 +165,7 @@
       playerUrl = "http://localhost:8888/Oregon_Trail/game/json/game_" + gameId + "/player_" + gameId + ".json";
       currentPlyUrl = "http://localhost:8888/Oregon_Trail/game/game.php?token=<?php echo($_GET['token']); ?>";
     } else {
+      console.log("This went to the remote host");
       gameUrl = "https://oregon-trail-card-game.herokuapp.com/game/json/game_" + gameId + "/game_" + gameId + ".json";
       playerUrl = "https://oregon-trail-card-game.herokuapp.com/game/json/game_" + gameId + "/player_" + gameId + ".json";
       currentPlyUrl = "https://oregon-trail-card-game.herokuapp.com/game.php?token=<?php echo($_GET['token']); ?>";

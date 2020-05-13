@@ -1,5 +1,12 @@
 <?php
 
+  // Detects whether this is the local host or not
+  if ($_SERVER['HTTP_HOST'] == "localhost:8888") {
+    $isLocal = true;
+  } else {
+    $isLocal = false;
+  };
+
   // Takes any players back to their current game, based on any existing player_id
   if (isset($_SESSION['player_id']) && !isset($_GET['invalid'])) {
     $findPlayerStmt = $pdo->prepare("SELECT token FROM Player INNER JOIN Game WHERE Player.game_id=Game.game_id AND player_id=:pl");
@@ -62,32 +69,38 @@
           ':cp'=>$userId,
           ':gd'=>$gameId
         ));
-        // ... and creates the game's new folder...
-        mkdir("game/json/game_".$gameId);
-        // ... and creates the new game JSON file...
-        $gameInfoStmt = $pdo->prepare("SELECT * FROM Game WHERE game_id=:gid");
-        $gameInfoStmt->execute(array(
-          ':gid'=>(int)$gameId
-        ));
-        $gameInfoArray = [];
-        while ($oneGameInfo = $gameInfoStmt->fetch(PDO::FETCH_ASSOC)) {
-          $gameInfoArray[] = $oneGameInfo;
+        if ($isLocal == true) {
+          // ... and creates the game's new folder...
+          mkdir("game/json/game_".$gameId);
+          // ... and creates the new game JSON file...
+          $gameInfoStmt = $pdo->prepare("SELECT * FROM Game WHERE game_id=:gid");
+          $gameInfoStmt->execute(array(
+            ':gid'=>(int)$gameId
+          ));
+          $gameInfoArray = [];
+          while ($oneGameInfo = $gameInfoStmt->fetch(PDO::FETCH_ASSOC)) {
+            $gameInfoArray[] = $oneGameInfo;
+          };
+          $newGameFile = fopen("game/json/game_".$gameId."/game_".$gameId.".json","w");
+          fwrite($newGameFile, json_encode($gameInfoArray));
+          fclose($newGameFile);
+          // ... and creates the player JSON file...
+          $playerInfoStmt = $pdo->prepare("SELECT * FROM Player WHERE game_id=:gm");
+          $playerInfoStmt->execute(array(
+            ':gm'=>(int)$gameId
+          ));
+          $playerInfoArray = [];
+          while ($onePlayerInfo = $playerInfoStmt->fetch(PDO::FETCH_ASSOC)) {
+            $playerInfoArray[] = $onePlayerInfo;
+          };
+          $newPlayerFile = fopen("game/json/game_".$gameId."/player_".$gameId.".json","w");
+          fwrite($newPlayerFile, json_encode($playerInfoArray));
+          fclose($newPlayerFile);
+        } else {
+          $accessKey = $_ENV['AWS_ACCESS_KEY_ID'];
+          $secretKey = $_ENV['AWS_SECRET_KEY'];
+          $bucketName = $_ENV['S3_BUCKET'];
         };
-        $newGameFile = fopen("game/json/game_".$gameId."/game_".$gameId.".json","w");
-        fwrite($newGameFile, json_encode($gameInfoArray));
-        fclose($newGameFile);
-        // ... and creates the player JSON file...
-        $playerInfoStmt = $pdo->prepare("SELECT * FROM Player WHERE game_id=:gm");
-        $playerInfoStmt->execute(array(
-          ':gm'=>(int)$gameId
-        ));
-        $playerInfoArray = [];
-        while ($onePlayerInfo = $playerInfoStmt->fetch(PDO::FETCH_ASSOC)) {
-          $playerInfoArray[] = $onePlayerInfo;
-        };
-        $newPlayerFile = fopen("game/json/game_".$gameId."/player_".$gameId.".json","w");
-        fwrite($newPlayerFile, json_encode($playerInfoArray));
-        fclose($newPlayerFile);
         $_SESSION['message'] = "<div style='color:green'>Your party was created!</div>";
         header("Location: game/game.php?token=".$newToken);
         exit;
@@ -112,6 +125,14 @@
   // echo("</pre><div>Session:</div>");
   // echo("<pre>");
   // var_dump($_SESSION);
+  // echo("</pre><div>Server:</div>");
+  // echo("<pre>");
+  // var_dump($_SERVER);
   // echo("</pre>");
+  if ($isLocal == false) {
+    echo("<pre>");
+    var_dump([$accessKey,$secretKey,$bucketName]);
+    echo("</pre>");
+  };
 
 ?>

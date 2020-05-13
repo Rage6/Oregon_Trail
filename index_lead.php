@@ -131,7 +131,7 @@
   // echo("</pre>");
   if ($isLocal == false) {
     echo("<pre>");
-    var_dump([$accessKey,$secretKey,$bucketName]);
+    var_dump($_ENV);
     echo("</pre>");
   };
 

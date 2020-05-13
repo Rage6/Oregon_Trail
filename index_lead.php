@@ -132,6 +132,8 @@
   if ($isLocal == false) {
     echo("<pre>");
     var_dump($_ENV);
+    var_dump($_ENV["S3_BUCKET"]);
+    var_dump($_ENV[5]["S3_BUCKET"]);
     echo("</pre>");
   };
 

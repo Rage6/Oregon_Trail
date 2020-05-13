@@ -100,11 +100,7 @@
           $accessKey = $_ENV["AWS_ACCESS_KEY_ID"];
           $secretKey = $_ENV["AWS_SECRET_KEY"];
           $bucketName = $_ENV["S3_BUCKET"];
-          echo("<pre>");
-          var_dump($accessKey);
-          var_dump($secretKey);
-          var_dump($bucketName);
-          echo("</pre>");
+          
         };
         $_SESSION['message'] = "<div style='color:green'>Your party was created!</div>";
         header("Location: game/game.php?token=".$newToken);

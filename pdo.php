@@ -8,7 +8,7 @@
     $pdo = new PDO('mysql:host=localhost;port=8888;dbname=Oregon_Trail','Nick','Ike');
   } else {
     $isLocal = false;
-    $pdo = new PDO('mysql:host=us-cdbr-iron-east-01.cleardb.net;port=3306;dbname=heroku_a1c8419498096ac','b69578920b8ccd','*password_here');
+    $pdo = new PDO('mysql:host=us-cdbr-iron-east-01.cleardb.net;port=3306;dbname=heroku_a1c8419498096ac','b69578920b8ccd',$_ENV["CLEARDB_PASSWORD"]);
   };
 
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

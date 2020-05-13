@@ -97,9 +97,9 @@
           fwrite($newPlayerFile, json_encode($playerInfoArray));
           fclose($newPlayerFile);
         } else {
-          $accessKey = $_ENV['AWS_ACCESS_KEY_ID'];
-          $secretKey = $_ENV['AWS_SECRET_KEY'];
-          $bucketName = $_ENV['S3_BUCKET'];
+          $accessKey = $_ENV["AWS_ACCESS_KEY_ID"];
+          $secretKey = $_ENV["AWS_SECRET_KEY"];
+          $bucketName = $_ENV["S3_BUCKET"];
         };
         $_SESSION['message'] = "<div style='color:green'>Your party was created!</div>";
         header("Location: game/game.php?token=".$newToken);
@@ -131,9 +131,9 @@
   // echo("</pre>");
   if ($isLocal == false) {
     echo("<pre>");
-    var_dump($_ENV);
-    var_dump($_ENV["S3_BUCKET"]);
-    var_dump($_ENV[5]["S3_BUCKET"]);
+    var_dump($accessKey]);
+    var_dump($secretKey]);
+    var_dump($bucketName]);
     echo("</pre>");
   };
 

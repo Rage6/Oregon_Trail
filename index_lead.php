@@ -131,9 +131,9 @@
   // echo("</pre>");
   if ($isLocal == false) {
     echo("<pre>");
-    var_dump($accessKey]);
-    var_dump($secretKey]);
-    var_dump($bucketName]);
+    var_dump($accessKey);
+    var_dump($secretKey);
+    var_dump($bucketName);
     echo("</pre>");
   };
 

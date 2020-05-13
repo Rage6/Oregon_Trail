@@ -101,19 +101,19 @@
           $accessKey = $_ENV["AWS_ACCESS_KEY_ID"];
           $secretKey = $_ENV["AWS_SECRET_KEY"];
           $bucketName = $_ENV["S3_BUCKET"];
-          // $s3 = new Aws\S3\S3Client([
-          //   'version'=>'2020-05-12',
-          //   'region'=>'us-east-2',
-          // ]);
-          // // // Creates the 'game' file
-          // $gameInfoStmt = $pdo->prepare("SELECT * FROM Game WHERE game_id=:gid");
-          // $gameInfoStmt->execute(array(
-          //   ':gid'=>(int)$gameId
-          // ));
-          // $gameInfoArray = [];
-          // while ($oneGameInfo = $gameInfoStmt->fetch(PDO::FETCH_ASSOC)) {
-          //   $gameInfoArray[] = $oneGameInfo;
-          // };
+          $s3 = new Aws\S3\S3Client([
+            'version'=>'2020-05-12',
+            'region'=>'us-east-2',
+          ]);
+          // Creates the 'game' file
+          $gameInfoStmt = $pdo->prepare("SELECT * FROM Game WHERE game_id=:gid");
+          $gameInfoStmt->execute(array(
+            ':gid'=>(int)$gameId
+          ));
+          $gameInfoArray = [];
+          while ($oneGameInfo = $gameInfoStmt->fetch(PDO::FETCH_ASSOC)) {
+            $gameInfoArray[] = $oneGameInfo;
+          };
           // $uploadGame = $s3->upload($bucketName,$_FILES['userfile']['game_'.$gameId.'.json'],fopen($_FILES['userfile']['tmp_name'],'w'));
           // fwrite($uploadGame, json_encode($gameInfoArray));
           // fclose($uploadGame);

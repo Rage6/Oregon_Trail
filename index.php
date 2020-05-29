@@ -39,6 +39,19 @@
         <div id="newGameBox" class="newGameBox">
           <form method="POST">
             <div>
+              Game Mode:
+              <select name="modeId">
+                <?php
+                  // $modeList = [];
+                  while ($oneMode = $modeListStmt->fetch(PDO::FETCH_ASSOC)) {
+                    echo("<option value='".$oneMode['mode_id']."'>".$oneMode['game_mode']."</option>");
+                  };
+                ?>
+                <!-- <option value="1">Classic</option>
+                <option value="2">Coronavirus</option> -->
+              </select>
+            </div>
+            <div>
               Travel party name:
               <input type="text" name="partyName" placeholder="required"/>
             </div>

@@ -29,6 +29,10 @@
     };
   };
 
+  // Lists all of the game modes
+  $modeListStmt = $pdo->prepare("SELECT * FROM Mode");
+  $modeListStmt->execute();
+
   // What takes place when a new game is started
   if (isset($_POST['newGame'])) {
     if ($_POST['partyName'] == '') {
@@ -43,11 +47,12 @@
         // This creates the new game...
         $newToken = bin2hex(random_bytes(10));
         $startTime = time();
-        $insertGameStmt = $pdo->prepare("INSERT INTO Game (token,start_time,party_name,party_size,until_end) VALUES (:tk,:st,:pn,:ps,:ue)");
+        $insertGameStmt = $pdo->prepare("INSERT INTO Game (token,start_time,party_name,mode_id,party_size,until_end) VALUES (:tk,:st,:pn,:mi,:ps,:ue)");
         $insertGameStmt->execute(array(
           ':tk'=>$newToken,
           ':st'=>$startTime,
           ':pn'=>htmlentities($_POST['partyName']),
+          ':mi'=>htmlentities($_POST['modeId']),
           ':ps'=>htmlentities($_POST['playerTotal']),
           ':ue'=>40
         ));
@@ -69,56 +74,48 @@
           ':cp'=>$userId,
           ':gd'=>$gameId
         ));
-        if ($isLocal == true) {
-          // ... and creates the game's new folder...
-          mkdir("game/json/game_".$gameId);
-          // ... and creates the new game JSON file...
-          $gameInfoStmt = $pdo->prepare("SELECT * FROM Game WHERE game_id=:gid");
-          $gameInfoStmt->execute(array(
-            ':gid'=>(int)$gameId
-          ));
-          $gameInfoArray = [];
-          while ($oneGameInfo = $gameInfoStmt->fetch(PDO::FETCH_ASSOC)) {
-            $gameInfoArray[] = $oneGameInfo;
-          };
-          $newGameFile = fopen("game/json/game_".$gameId."/game_".$gameId.".json","w");
-          fwrite($newGameFile, json_encode($gameInfoArray));
-          fclose($newGameFile);
-          // ... and creates the player JSON file...
-          $playerInfoStmt = $pdo->prepare("SELECT * FROM Player WHERE game_id=:gm");
-          $playerInfoStmt->execute(array(
-            ':gm'=>(int)$gameId
-          ));
-          $playerInfoArray = [];
-          while ($onePlayerInfo = $playerInfoStmt->fetch(PDO::FETCH_ASSOC)) {
-            $playerInfoArray[] = $onePlayerInfo;
-          };
-          $newPlayerFile = fopen("game/json/game_".$gameId."/player_".$gameId.".json","w");
-          fwrite($newPlayerFile, json_encode($playerInfoArray));
-          fclose($newPlayerFile);
-        } else {
-          // Preparation info for AWS
-          $accessKey = $_ENV["AWS_ACCESS_KEY_ID"];
-          $secretKey = $_ENV["AWS_SECRET_KEY"];
-          $bucketName = $_ENV["S3_BUCKET"];
-          $s3 = new Aws\S3\S3Client([
-            'version'=>'2020-05-12',
-            'region'=>'us-east-2',
-          ]);
-          // Creates the 'game' file
-          $gameInfoStmt = $pdo->prepare("SELECT * FROM Game WHERE game_id=:gid");
-          $gameInfoStmt->execute(array(
-            ':gid'=>(int)$gameId
-          ));
-          $gameInfoArray = [];
-          while ($oneGameInfo = $gameInfoStmt->fetch(PDO::FETCH_ASSOC)) {
-            $gameInfoArray[] = $oneGameInfo;
-          };
-          // $uploadGame = $s3->upload($bucketName,$_FILES['userfile']['game_'.$gameId.'.json'],fopen($_FILES['userfile']['tmp_name'],'w'));
-          // fwrite($uploadGame, json_encode($gameInfoArray));
-          // fclose($uploadGame);
-
+        // ... and creates the game's new folder...
+        mkdir("game/json/game_".$gameId);
+        // ... and creates the new game JSON file...
+        $gameInfoStmt = $pdo->prepare("SELECT * FROM Game WHERE game_id=:gid");
+        $gameInfoStmt->execute(array(
+          ':gid'=>(int)$gameId
+        ));
+        $gameInfoArray = [];
+        while ($oneGameInfo = $gameInfoStmt->fetch(PDO::FETCH_ASSOC)) {
+          $gameInfoArray[] = $oneGameInfo;
         };
+        $newGameFile = fopen("game/json/game_".$gameId."/game_".$gameId.".json","w");
+        fwrite($newGameFile, json_encode($gameInfoArray));
+        fclose($newGameFile);
+        // ... and creates the player JSON file...
+        $playerInfoStmt = $pdo->prepare("SELECT * FROM Player WHERE game_id=:gm");
+        $playerInfoStmt->execute(array(
+          ':gm'=>(int)$gameId
+        ));
+        $playerInfoArray = [];
+        while ($onePlayerInfo = $playerInfoStmt->fetch(PDO::FETCH_ASSOC)) {
+          $playerInfoArray[] = $onePlayerInfo;
+        };
+        $newPlayerFile = fopen("game/json/game_".$gameId."/player_".$gameId.".json","w");
+        fwrite($newPlayerFile, json_encode($playerInfoArray));
+        fclose($newPlayerFile);
+        // ... and creates the Trail card file...
+        $trailInfoStmt = $pdo->prepare("SELECT trail_id,picked_by,how_many,top_num,bottom_num,has_calamity,can_drown,lose_supplies,is_fort,is_town FROM Trail JOIN RouteDesign JOIN Mode WHERE Mode.mode_id=:mid AND RouteDesign.route_id=Mode.route_id AND Trail.route_id=RouteDesign.route_id");
+        $trailInfoStmt->execute(array(
+          ':mid'=>(int)htmlentities($_POST['modeId'])
+        ));
+        $trailInfoArray = [];
+        while ($oneTrailInfo = $trailInfoStmt->fetch(PDO::FETCH_ASSOC)) {
+          $trailInfoArray[] = $oneTrailInfo;
+        };
+        // This is where to expand the trail cards to the full deck before creating the JSON file
+        
+        //
+        $newTrailFile = fopen("game/json/game_".$gameId."/trail_".$gameId.".json","w");
+        fwrite($newTrailFile, json_encode($trailInfoArray));
+        fclose($newTrailFile);
+        // ... and finally goes to the game itself.
         $_SESSION['message'] = "<div style='color:green'>Your party was created!</div>";
         header("Location: game/game.php?token=".$newToken);
         exit;

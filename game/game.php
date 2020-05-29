@@ -28,6 +28,7 @@
         };
         echo("
           <div id='ldrOptBox' class='ldrOptBox'>
+            <div id='exitLdrBox'>X</div>
             <div class='inviteBox'>
               <div id='inviteBttn' class='inviteBttn'>
                 COPY LINK
@@ -140,7 +141,7 @@
       <div class="yourTurnBox">
         <div style="display:flex;justify-content:space-between">
           <div id="trailCard">TRAIL CARD</div>
-          <div>SUPPLY CARD</div>
+          <div id="supplyCard">SUPPLY CARD</div>
         </div>
         <form id="nextTurn" class="nextTurn">
           <!-- button is displayed here when it is the player's turn -->
@@ -193,6 +194,11 @@
     // Opens, closes the 'Party Leader' options
     $("#ldrOptBttn").click(()=>{
       openOrClose(".ldrOpt");
+      openOrClose(".ldrOptBox");
+    });
+
+    // Closes the 'Party Leader' option with its corner 'X' button
+    $("#exitLdrBox").click(()=>{
       openOrClose(".ldrOptBox");
     });
 
@@ -310,9 +316,16 @@
 
     // The cardAction shows whether a trail or supply card is being used
     cardAction = null;
+
     $("#trailCard").click(()=>{
       cardAction = "trail";
       console.log("Trail Card selected: " + cardAction);
+    });
+
+    cardAction = null;
+    $("#supplyCard").click(()=>{
+      cardAction = "supply";
+      console.log("Supply Card selected: " + cardAction);
     });
 
     // Completes a player's turn and switches to the next player
@@ -346,11 +359,6 @@
 
     // Initial data check
     checkCurrentData();
-
-    // // Closes the Leader Options after starting the game
-    // if (currentGameData[0]['active'] == "1") {
-    //   $(".ldrOptBox").css("display","none");
-    // };
 
     // Runs the data checks every 5 seconds
     runIntervalTool();

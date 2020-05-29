@@ -36,7 +36,7 @@
     exit;
   };
 
-  // Checks if you are a party member already
+  // Checks if you are already in a party
   if (isset($_SESSION['player_id'])) {
     // Checks if you are a member of THIS party arleady
     $matchGameIdStmt = $pdo->prepare("SELECT game_id FROM Player WHERE Player.player_id=:pid");

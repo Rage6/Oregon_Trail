@@ -44,6 +44,12 @@
         header("Location: index.php");
         exit;
       } else {
+        // Finds the Route's total length
+        $getRouteLengthStmt = $pdo->prepare("SELECT route_length FROM RouteDesign JOIN Mode WHERE RouteDesign.route_id=Mode.route_id AND Mode.mode_id=:md");
+        $getRouteLengthStmt->execute(array(
+          ':md'=>htmlentities($_POST['modeId'])
+        ));
+        $routeLength = $getRouteLengthStmt->fetch(PDO::FETCH_ASSOC)['route_length'];
         // This creates the new game...
         $newToken = bin2hex(random_bytes(10));
         $startTime = time();
@@ -54,7 +60,7 @@
           ':pn'=>htmlentities($_POST['partyName']),
           ':mi'=>htmlentities($_POST['modeId']),
           ':ps'=>htmlentities($_POST['playerTotal']),
-          ':ue'=>40
+          ':ue'=>$routeLength
         ));
         // ... and this makes the creator's player...
         $gameId = $pdo->lastInsertId();
@@ -110,8 +116,21 @@
           $trailInfoArray[] = $oneTrailInfo;
         };
         // This is where to expand the trail cards to the full deck before creating the JSON file
-        
-        //
+        $countTrailStmt = $pdo->prepare("SELECT COUNT('trail_id') AS count FROM Trail JOIN RouteDesign JOIN Mode WHERE Mode.mode_id=:mo AND RouteDesign.route_id=Mode.route_id AND Trail.route_id=RouteDesign.route_id");
+        $countTrailStmt->execute(array(
+          ':mo'=>(int)htmlentities($_POST['modeId'])
+        ));
+        $trailTotal = $countTrailStmt->fetch(PDO::FETCH_ASSOC)['count'];
+        for ($trailNum = 0; $trailNum < $trailTotal; $trailNum++) {
+          $trailCard = $trailInfoArray[$trailNum];
+          if ($trailCard['how_many'] > 1) {
+            $moreTrailCards = $trailCard['how_many'] - 1;
+            for ($addTrail = 0; $addTrail < $moreTrailCards; $addTrail++) {
+              $trailInfoArray[] = $trailCard;
+            };
+          };
+        };
+
         $newTrailFile = fopen("game/json/game_".$gameId."/trail_".$gameId.".json","w");
         fwrite($newTrailFile, json_encode($trailInfoArray));
         fclose($newTrailFile);

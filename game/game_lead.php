@@ -112,8 +112,36 @@
       $decodedInactiveJson[0]["active"] = "1";
       $activateGameJson = json_encode($decodedInactiveJson);
       file_put_contents("json/game_".$getGameId."/game_".$getGameId.".json",$activateGameJson);
+      // Assign each user their initial trail cards by...
+      // ...getting all of the player id's...
+      $playerListJson = file_get_contents("json/game_".$getGameId."/player_".$getGameId.".json");
+      $decodePlayerList = json_decode($playerListJson,true);
+      $playerList = [];
+      for ($plyNum = 0; $plyNum < count($decodePlayerList); $plyNum++) {
+        $playerList[] = $decodePlayerList[$plyNum]["player_id"];
+      };
+      // ...then get all of the trail cards...
+      $trailListJson = file_get_contents("json/game_".$getGameId."/trail_".$getGameId.".json");
+      $decodeTrailList = json_decode($trailListJson,true);
+      // ...then assign trail cards to each player.
+      $takenTrailCards = [];
+      $playerTotal = count($playerList);
+      $trailTotal = count($decodeTrailList);
+      for ($plNum = 0; $plNum < $playerTotal; $plNum++) {
+        for ($pickedTrailNum = 0; $pickedTrailNum < 5; $pickedTrailNum++) {
+          $lastTrailNum = $trailTotal - 1;
+          $trailNum = rand(0,$lastTrailNum);
+          if ($decodeTrailList[$trailNum]["picked_by"] == "0") {
+            $decodeTrailList[$trailNum]["picked_by"] = $playerList[$plNum];
+          } else {
+            $pickedTrailNum--;
+          };
+        };
+      };
+      $assignInitTrailCards = json_encode($decodeTrailList);
+      file_put_contents("json/game_".$getGameId."/trail_".$getGameId.".json",$assignInitTrailCards);
+      // End the start-up process and refresh the game file
       $_SESSION['message'] = "<div style='color:white;background-color:green'>Your travel has begun!</div>";
-      header("Location: game.php?token=".$_GET['token']);
       exit;
     } else {
       $_SESSION['message'] = "<div style='color:red;background-color:white'>You planned to have ".(int)$getGameInfo['party_size']." party members, but only ".$currentCount." is/are present. You can wait for your remaining member(s), or end this game to start a new one with the desired party size.</div>";

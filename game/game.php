@@ -232,8 +232,35 @@
     // To mark this as the first run on the interval cycle
     let firstRun = true;
 
+    // Updates the player's trail cards on the screen
+    const trailUpdateScreen = (traData) => {
+      // The 6 points at which a trail starts and stops are labeled as such:
+      //   1      2      3    (TOP)
+      //  -----------------
+      //  |               |
+      //  |               |
+      //  |               |
+      //  |               |
+      //  |               |
+      //  |               |
+      //  |               |
+      //  |               |
+      //  |               |
+      //  -----------------
+      //   4      5      6    (BOTTOM)
+      $(".trailList").empty();
+      for (let trailNum = 0; trailNum < traData.length; trailNum++) {
+        let cardUser = traData[trailNum]["picked_by"];
+        if (cardUser == thisPlayer) {
+          let cardId = traData[trailNum]["trail_id"];
+          $(".trailList").append("\
+            <img style='max-width:200px' src='../images/cards/trails/trail_1_" + cardId + ".JPG'>");
+        };
+      };
+    };
+
     // Uses the updated Game data
-    const gmUpdateScreen = (gmData) => {
+    const gmUpdateScreen = (gmData,tlData) => {
       if (gmData[0]['active'] == "1") {
         $(".ifStarted").css("display","block");
         $(".startBox").css("display","none");
@@ -249,26 +276,7 @@
         $(".ifStarted").css("display","none");
       };
       $("#currentTrail").text(gmData[0]["until_end"]);
-      // This updates which trail cards the player currently has
-      // The 6 points at which a trail starts and stops are labeled as such:
-      //   1      2      3    (TOP)
-      //  -----------------
-      //  |               |
-      //  |               |
-      //  |               |
-      //  |               |
-      //  |               |
-      //  |               |
-      //  |               |
-      //  |               |
-      //  |               |
-      //  -----------------
-      //   4      5      6    (BOTTOM)
-      // let trailList = [];
-      // for () {
-      //
-      // };
-
+      trailUpdateScreen(tlData);
       // The below if/else determines whether to display the .yourTurnBox element or not based on whether the current player's id (in JSON) is the same as their player id (in a data attribute in their HTML)
       if (gmData[0]["current_player"] == thisPlayer) {
         if ($(".yourTurnBox").css('display') == "none") {
@@ -309,7 +317,7 @@
           };
         };
       };
-      gmUpdateScreen(gmeData);
+      gmUpdateScreen(gmeData,trlData);
     };
 
     const trailRequest = (plData,gData) => {

@@ -132,6 +132,47 @@ body {
   background-color: lightgreen;
 }
 
+.trailMain {
+
+}
+
+.trailTitle {
+  background-color: orange;
+}
+
+.trailList {
+  margin: 20px 5%;
+  display: flex;
+  justify-content: space-between;
+  overflow-x: scroll;
+  width: 90%;
+}
+
+.trailList img {
+  margin-right: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  width: 200px;
+  height: 300px;
+}
+
+.trailList img:hover {
+  border: 5px solid orange;
+}
+
+.supplyMain {
+
+}
+
+.supplyTitle {
+
+}
+
+.supplyMain {
+
+}
+
 .yourTurnBox {
   display: none;
 }

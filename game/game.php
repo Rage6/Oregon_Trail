@@ -254,7 +254,7 @@
         if (cardUser == thisPlayer) {
           let cardId = traData[trailNum]["trail_id"];
           $(".trailList").append("\
-            <img style='max-width:200px' src='../images/cards/trails/trail_1_" + cardId + ".JPG'>");
+            <img src='../images/cards/trails/trail_1_" + cardId + ".JPG'>");
         };
       };
     };

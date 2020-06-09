@@ -142,6 +142,7 @@
       file_put_contents("json/game_".$getGameId."/trail_".$getGameId.".json",$assignInitTrailCards);
       // End the start-up process and refresh the game file
       $_SESSION['message'] = "<div style='color:white;background-color:green'>Your travel has begun!</div>";
+      header("Location: game.php?token=".$_GET['token']);
       exit;
     } else {
       $_SESSION['message'] = "<div style='color:red;background-color:white'>You planned to have ".(int)$getGameInfo['party_size']." party members, but only ".$currentCount." is/are present. You can wait for your remaining member(s), or end this game to start a new one with the desired party size.</div>";

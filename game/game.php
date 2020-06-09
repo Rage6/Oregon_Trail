@@ -138,11 +138,26 @@
       </div>
       <div id="playerStatus">
       </div>
-      <div class="yourTurnBox">
-        <div style="display:flex;justify-content:space-between">
-          <div id="trailCard">TRAIL CARD</div>
-          <div id="supplyCard">SUPPLY CARD</div>
+      <div>
+        <div class="trailMain">
+          <div class="trailTitle">TRAIL CARDS</div>
+          <div class="trailList" id="trailList">
+            <!-- Here is where all of the player's trail cards are shown -->
+            <!-- Note: The img names are based on their a) MODE # and b) TRAIL ID # -->
+            <!--
+              Example: The second trail in the dB (trail_id = 2) is in the 'Original' mode
+              (mode_id = 1), so the appropriate image name is 'trail_1_2.jpg'.
+            -->
+          </div>
         </div>
+        <div class="supplyMain">
+          <div class="supplyTitle">SUPPLY CARDS</div>
+          <div class="supplyList">
+            <!-- Here is where all of the player's supply cards are shown -->
+          </div>
+        </div>
+      </div>
+      <div class="yourTurnBox">
         <form id="nextTurn" class="nextTurn">
           <!-- button is displayed here when it is the player's turn -->
           <button type="submit" class='clickBttn'>
@@ -164,6 +179,7 @@
       console.log("This went to the local host");
       gameUrl = "http://localhost:8888/Oregon_Trail/game/json/game_" + gameId + "/game_" + gameId + ".json";
       playerUrl = "http://localhost:8888/Oregon_Trail/game/json/game_" + gameId + "/player_" + gameId + ".json";
+      trailUrl = "http://localhost:8888/Oregon_Trail/game/json/game_" + gameId + "/trail_" + gameId + ".json";
       currentPlyUrl = "http://localhost:8888/Oregon_Trail/game/game.php?token=<?php echo($_GET['token']); ?>";
     } else {
       console.log("This went to the remote host");
@@ -233,6 +249,26 @@
         $(".ifStarted").css("display","none");
       };
       $("#currentTrail").text(gmData[0]["until_end"]);
+      // This updates which trail cards the player currently has
+      // The 6 points at which a trail starts and stops are labeled as such:
+      //   1      2      3    (TOP)
+      //  -----------------
+      //  |               |
+      //  |               |
+      //  |               |
+      //  |               |
+      //  |               |
+      //  |               |
+      //  |               |
+      //  |               |
+      //  |               |
+      //  -----------------
+      //   4      5      6    (BOTTOM)
+      // let trailList = [];
+      // for () {
+      //
+      // };
+
       // The below if/else determines whether to display the .yourTurnBox element or not based on whether the current player's id (in JSON) is the same as their player id (in a data attribute in their HTML)
       if (gmData[0]["current_player"] == thisPlayer) {
         if ($(".yourTurnBox").css('display') == "none") {
@@ -246,7 +282,7 @@
     };
 
     // Uses the updated Player data
-    const plyUpdateScreen = (plyData,gmeData) => {
+    const plyUpdateScreen = (plyData,gmeData,trlData) => {
       $(".playerList").empty();
       $(".playerList").append("\
         <div class='playerRow topRow'>\
@@ -276,6 +312,23 @@
       gmUpdateScreen(gmeData);
     };
 
+    const trailRequest = (plData,gData) => {
+      let trailRequest = new XMLHttpRequest();
+      let trailUrlWithTime = trailUrl + "?time=" + Date.now();
+      trailRequest.open('GET', trailUrlWithTime, true);
+      trailRequest.onload = () => {
+        if (trailRequest.status == 200) {
+          let trailData = JSON.parse(trailRequest.responseText);
+          console.log(trailData);
+          plyUpdateScreen(plData,gData,trData);
+        };
+      };
+      trailRequest.onerror = () => {
+        console.log("An error occurred in trailData");
+      };
+      trailRequest.send();
+    };
+
     // Requests Player update from JSON
     const playerRequest = (gmData) => {
       let playerRequest = new XMLHttpRequest();
@@ -285,7 +338,8 @@
         if (playerRequest.status == 200) {
           let playerData = JSON.parse(playerRequest.responseText);
           console.log(playerData);
-          plyUpdateScreen(playerData,gmData);
+          trailRequest(playerData,gmData)
+          // plyUpdateScreen(playerData,gmData);
         };
       };
       playerRequest.onerror = () => {
@@ -316,11 +370,6 @@
 
     // The cardAction shows whether a trail or supply card is being used
     cardAction = null;
-
-    $("#trailCard").click(()=>{
-      cardAction = "trail";
-      console.log("Trail Card selected: " + cardAction);
-    });
 
     cardAction = null;
     $("#supplyCard").click(()=>{

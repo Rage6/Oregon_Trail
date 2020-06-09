@@ -320,7 +320,7 @@
         if (trailRequest.status == 200) {
           let trailData = JSON.parse(trailRequest.responseText);
           console.log(trailData);
-          plyUpdateScreen(plData,gData,trData);
+          plyUpdateScreen(plData,gData,trailData);
         };
       };
       trailRequest.onerror = () => {

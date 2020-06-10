@@ -18,6 +18,7 @@
   ));
   $getGameInfo = $getGameInfoStmt->fetch(PDO::FETCH_ASSOC);
   $getGameId = (int)$getGameInfo['game_id'];
+  $getGameMode = (int)$getGameInfo['mode_id'];
 
   // To retrieve a game_id based on the token in the URL
   if (isset($_GET['token'])) {
@@ -161,12 +162,13 @@
     $trailLeftStmt->execute(array(
       ':ga'=>$thisGameId
     ));
-    $trailLeft = $trailLeftStmt->fetch(PDO::FETCH_ASSOC);
+    $trailLeft = $trailLeftStmt->fetch(PDO::FETCH_ASSOC)['until_end'];
     return $trailLeft;
   };
 
   // Turn the next player into the current player
   if (isset($_POST['player'])) {
+    $lessTrail = null;
     if ($_POST['action'] == "trail") {
       $lessTrail = trailCardUse($pdo,$getGameId);
     };
@@ -207,7 +209,8 @@
     $gameJsonFile = file_get_contents("json/game_".$getGameId."/game_".$getGameId.".json");
     $decodedGameJson = json_decode($gameJsonFile, true);
     $decodedGameJson[0]["current_player"] = strval($nextPlayerId);
-    $decodedGameJson[0]["until_end"] = $lessTrail["until_end"];
+    // $decodedGameJson[0]["until_end"] = $lessTrail["until_end"];
+    $decodedGameJson[0]["until_end"] = $lessTrail;
     $updatedGameJson = json_encode($decodedGameJson);
     file_put_contents("json/game_".$getGameId."/game_".$getGameId.".json",$updatedGameJson);
     header("Location: game.php?token=".$_GET['token']);

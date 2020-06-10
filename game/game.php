@@ -18,7 +18,7 @@
     crossorigin="anonymous"></script>
     <!-- <script src="js/main.js"></script> -->
   </head>
-  <body data-game="<?php echo($getGameId) ?>" data-player="<?php echo($_SESSION['player_id']) ?>">
+  <body data-game="<?php echo($getGameId) ?>" data-player="<?php echo($_SESSION['player_id']) ?>" data-mode="<?php echo($getGameMode) ?>">
     <?php
       if ($partyHead == true) {
         if ($isLocal == true) {
@@ -140,8 +140,8 @@
       </div>
       <div>
         <div class="trailMain">
-          <div class="trailTitle">TRAIL CARDS</div>
-          <div class="trailList" id="trailList">
+          <div class="trailTitle" id="trailCard">TRAIL CARDS</div>
+          <div class="trailList">
             <!-- Here is where all of the player's trail cards are shown -->
             <!-- Note: The img names are based on their a) MODE # and b) TRAIL ID # -->
             <!--
@@ -151,7 +151,7 @@
           </div>
         </div>
         <div class="supplyMain">
-          <div class="supplyTitle">SUPPLY CARDS</div>
+          <div class="supplyTitle" id="supplyCard">SUPPLY CARDS</div>
           <div class="supplyList">
             <!-- Here is where all of the player's supply cards are shown -->
           </div>
@@ -172,6 +172,7 @@
   // $(document).ready(()=>{
 
     const gameId = $("body").attr("data-game");
+    const modeId = $("body").attr("data-mode");
     let gameUrl = null;
     let playerUrl = null;
     let currentPlyUrl = null;
@@ -235,26 +236,26 @@
     // Updates the player's trail cards on the screen
     const trailUpdateScreen = (traData) => {
       // The 6 points at which a trail starts and stops are labeled as such:
-      //   1      2      3    (TOP)
-      //  -----------------
-      //  |               |
-      //  |               |
-      //  |               |
-      //  |               |
-      //  |               |
-      //  |               |
-      //  |               |
-      //  |               |
-      //  |               |
-      //  -----------------
-      //   4      5      6    (BOTTOM)
+      //   1    2    3   (TOP)              6    5    4   (BOTTOM)
+      //  -------------                    -------------
+      //  |           |                    |           |
+      //  |           |                    |           |
+      //  |           |                    |           |
+      //  |           |           <---     |           |
+      //  |           |                    |           |
+      //  |           |                    |           |
+      //  |           |           ---->    |           |
+      //  |           |                    |           |
+      //  |           |                    |           |
+      //  -------------                    -------------
+      //   4    5    6   (BOTTOM)           3    2    1    (TOP)
       $(".trailList").empty();
       for (let trailNum = 0; trailNum < traData.length; trailNum++) {
         let cardUser = traData[trailNum]["picked_by"];
         if (cardUser == thisPlayer) {
           let cardId = traData[trailNum]["trail_id"];
           $(".trailList").append("\
-            <img src='../images/cards/trails/trail_1_" + cardId + ".JPG'>");
+            <img src='../images/cards/trails/trail_"+ modeId +"_" + cardId + ".JPG'>");
         };
       };
     };
@@ -275,16 +276,15 @@
       } else {
         $(".ifStarted").css("display","none");
       };
-      $("#currentTrail").text(gmData[0]["until_end"]);
+      $("#currentTrail").text(gmData[0]['until_end']);
       trailUpdateScreen(tlData);
-      // The below if/else determines whether to display the .yourTurnBox element or not based on whether the current player's id (in JSON) is the same as their player id (in a data attribute in their HTML)
+      // This display the .yourTurnBox element to the current player by comparing the current player's id (in JSON) the player's id (in their HTML)
+      // Note: This could be used for cheating! To prevent it, make the HTML value much less predictable, or build it in so that each iteration confirms it
       if (gmData[0]["current_player"] == thisPlayer) {
         if ($(".yourTurnBox").css('display') == "none") {
-          // $("#playerStatus").text("It is your turn");
           $(".yourTurnBox").css("display","block");
         };
       } else {
-        // $("#playerStatus").empty();
         $(".yourTurnBox").css("display","none");
       };
     };
@@ -377,12 +377,14 @@
     };
 
     // The cardAction shows whether a trail or supply card is being used
-    cardAction = null;
-
-    cardAction = null;
+    let cardAction = null;
+    $("#trailCard").click(()=>{
+      cardAction = "trail";
+      console.log("Card selected: " + cardAction);
+    });
     $("#supplyCard").click(()=>{
       cardAction = "supply";
-      console.log("Supply Card selected: " + cardAction);
+      console.log("Card selected: " + cardAction);
     });
 
     // Completes a player's turn and switches to the next player

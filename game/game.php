@@ -257,11 +257,10 @@
         let cardUser = traData[trailNum]["picked_by"];
         if (cardUser == thisPlayer) {
           let cardId = traData[trailNum]["trail_id"];
-          $(".trailList").append("<img id='trailCard' data-action='trail' data-card='" + cardId + "' src='../images/cards/trails/trail_"+ modeId +"_" + cardId + ".JPG'>");
+          $(".trailList").append("<img data-action='trail' data-card='" + cardId + "' src='../images/cards/trails/trail_"+ modeId +"_" + cardId + ".JPG'>");
         };
       };
 
-      // $("#trailCard").click(()=>{
       $("[data-action='trail']").click(()=>{
         cardAction = "trail";
         console.log("Card selected: " + cardAction);
@@ -387,18 +386,6 @@
       };
       gameRequest.send();
     };
-
-    // // The cardAction shows whether a trail or supply card is being used
-    // let cardAction = null;
-    // // $("#trailCard").click(()=>{
-    // $("[data-action='trail']").click(()=>{
-    //   cardAction = "trail";
-    //   console.log("Card selected: " + cardAction);
-    // });
-    // $("#supplyCard").click(()=>{
-    //   cardAction = "supply";
-    //   console.log("Card selected: " + cardAction);
-    // });
 
     // Completes a player's turn and switches to the next player
     const switchPlayer = (e)=>{

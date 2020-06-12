@@ -140,7 +140,7 @@
       </div>
       <div>
         <div class="trailMain">
-          <div class="trailTitle" id="trailCard">TRAIL CARDS</div>
+          <div class="trailTitle">TRAIL CARDS</div>
           <div class="trailList">
             <!-- Here is where all of the player's trail cards are shown -->
             <!-- Note: The img names are based on their a) MODE # and b) TRAIL ID # -->
@@ -151,7 +151,7 @@
           </div>
         </div>
         <div class="supplyMain">
-          <div class="supplyTitle" id="supplyCard">SUPPLY CARDS</div>
+          <div class="supplyTitle">SUPPLY CARDS</div>
           <div class="supplyList">
             <!-- Here is where all of the player's supply cards are shown -->
           </div>
@@ -161,7 +161,7 @@
         <form id="nextTurn" class="nextTurn">
           <!-- button is displayed here when it is the player's turn -->
           <button type="submit" class='clickBttn'>
-            DONE
+            USE CARD
           </button>
         </form>
       </div>
@@ -191,6 +191,8 @@
 
     let thisPlayer = $("body").attr("data-player");
     let currentGameData = null;
+    // The cardAction shows whether a trail or supply card is being used
+    let cardAction = null;
 
     let turnOver = false;
 
@@ -249,15 +251,25 @@
       //  |           |                    |           |
       //  -------------                    -------------
       //   4    5    6   (BOTTOM)           3    2    1    (TOP)
+
       $(".trailList").empty();
       for (let trailNum = 0; trailNum < traData.length; trailNum++) {
         let cardUser = traData[trailNum]["picked_by"];
         if (cardUser == thisPlayer) {
           let cardId = traData[trailNum]["trail_id"];
-          $(".trailList").append("\
-            <img src='../images/cards/trails/trail_"+ modeId +"_" + cardId + ".JPG'>");
+          $(".trailList").append("<img id='trailCard' data-action='trail' data-card='" + cardId + "' src='../images/cards/trails/trail_"+ modeId +"_" + cardId + ".JPG'>");
         };
       };
+
+      // $("#trailCard").click(()=>{
+      $("[data-action='trail']").click(()=>{
+        cardAction = "trail";
+        console.log("Card selected: " + cardAction);
+      });
+      $("[data-action='supply']").click(()=>{
+        cardAction = "supply";
+        console.log("Card selected: " + cardAction);
+      });
     };
 
     // Uses the updated Game data
@@ -376,16 +388,17 @@
       gameRequest.send();
     };
 
-    // The cardAction shows whether a trail or supply card is being used
-    let cardAction = null;
-    $("#trailCard").click(()=>{
-      cardAction = "trail";
-      console.log("Card selected: " + cardAction);
-    });
-    $("#supplyCard").click(()=>{
-      cardAction = "supply";
-      console.log("Card selected: " + cardAction);
-    });
+    // // The cardAction shows whether a trail or supply card is being used
+    // let cardAction = null;
+    // // $("#trailCard").click(()=>{
+    // $("[data-action='trail']").click(()=>{
+    //   cardAction = "trail";
+    //   console.log("Card selected: " + cardAction);
+    // });
+    // $("#supplyCard").click(()=>{
+    //   cardAction = "supply";
+    //   console.log("Card selected: " + cardAction);
+    // });
 
     // Completes a player's turn and switches to the next player
     const switchPlayer = (e)=>{
@@ -393,6 +406,7 @@
       if (turnOver == false) {
         let playerParam = "player=" + window.encodeURIComponent(gameData[0]["current_player"]);
         let actionParam = "&action=" + window.encodeURIComponent(cardAction);
+        // let cardNum = "&cardNum=" + window.encodeURIComponent();
         let fullParam = playerParam + actionParam;
         console.log(fullParam);
         let turnRequest = new XMLHttpRequest();

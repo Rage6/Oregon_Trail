@@ -257,12 +257,14 @@
         let cardUser = traData[trailNum]["picked_by"];
         if (cardUser == thisPlayer) {
           let cardId = traData[trailNum]["trail_id"];
-          $(".trailList").append("<img data-action='trail' data-card='" + cardId + "' src='../images/cards/trails/trail_"+ modeId +"_" + cardId + ".JPG'>");
+          $(".trailList").append("<img data-action='trail' data-card='" + cardId + "' data-half='top' src='../images/cards/trails/trail_"+ modeId +"_" + cardId + ".JPG'>");
         };
       };
 
       $("[data-action='trail']").click(()=>{
         cardAction = "trail";
+        cardNum = event.target.dataset.card;
+        cardHalf = event.target.dataset.half;
         console.log("Card selected: " + cardAction);
       });
       $("[data-action='supply']").click(()=>{
@@ -393,8 +395,9 @@
       if (turnOver == false) {
         let playerParam = "player=" + window.encodeURIComponent(gameData[0]["current_player"]);
         let actionParam = "&action=" + window.encodeURIComponent(cardAction);
-        // let cardNum = "&cardNum=" + window.encodeURIComponent();
-        let fullParam = playerParam + actionParam;
+        let cardParam = "&cardId=" + window.encodeURIComponent(cardNum);
+        let halfParam = "&half=" + window.encodeURIComponent(cardHalf);
+        let fullParam = playerParam + actionParam + cardParam + halfParam;
         console.log(fullParam);
         let turnRequest = new XMLHttpRequest();
         turnRequest.onload = () => {

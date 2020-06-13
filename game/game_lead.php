@@ -166,11 +166,22 @@
     return $trailLeft;
   };
 
+  // // The function to set update the 'current_trail'
+  // function newCurrentTrail($pdoParam,$thisGameId) {
+  //   $updateCardStmt = $pdoParam->prepare("UPDATE Game SET current_trail = :ct WHERE game_id = :ge");
+  //   $updateCardStmt->execute(array(
+  //     ':ct'=>(int)htmlentities($_POST['cardId']),
+  //     ':ge'=>$getGameId
+  //   ));
+  // };
+
   // Turn the next player into the current player
   if (isset($_POST['player'])) {
     $lessTrail = null;
+    $currentTrail = $decodedGameJson[0]["current_trail"];
     if ($_POST['action'] == "trail") {
       $lessTrail = trailCardUse($pdo,$getGameId);
+      $currentTrail = $_POST['cardId'];
     };
     // First, identify the next player's id number
     $currentPlayer = (int)htmlentities($_POST['player']);
@@ -209,8 +220,8 @@
     $gameJsonFile = file_get_contents("json/game_".$getGameId."/game_".$getGameId.".json");
     $decodedGameJson = json_decode($gameJsonFile, true);
     $decodedGameJson[0]["current_player"] = strval($nextPlayerId);
-    // $decodedGameJson[0]["until_end"] = $lessTrail["until_end"];
     $decodedGameJson[0]["until_end"] = $lessTrail;
+    $decodedGameJson[0]["current_trail"] = $currentTrail;
     $updatedGameJson = json_encode($decodedGameJson);
     file_put_contents("json/game_".$getGameId."/game_".$getGameId.".json",$updatedGameJson);
     header("Location: game.php?token=".$_GET['token']);

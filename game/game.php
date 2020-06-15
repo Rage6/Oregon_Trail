@@ -193,7 +193,7 @@
     let currentGameData = null;
     // The cardAction shows whether a trail or supply card is being used
     let cardAction = null;
-
+    let cardNum = null;
     let turnOver = false;
 
     // Opens, closes the 'Party Leader' options
@@ -257,30 +257,57 @@
         let cardUser = traData[trailNum]["picked_by"];
         if (cardUser == thisPlayer) {
           let cardId = traData[trailNum]["trail_id"];
+          let typeId = traData[trailNum]["type_id"];
+          let orientation = traData[trailNum]["orientation"];
           let modeName = currentGameData[0]["template_name"];
           $(".trailList").append("\
             <div>\
               <img\
                 data-action='trail'\
                 data-card='" + cardId + "'\
-                data-half='top'\
-                src='../images/cards/trails/" + modeName + "/trail_"+ modeId +"_" + cardId + ".JPG'>\
+                src='../images/cards/trails/" + modeName + "/trail_"+ modeId +"_" + typeId + ".JPG'>\
               <button\
-                data-action='trail'\
                 data-card='" + cardId + "'\
-                data-rotate>\
+                data-orientation='"+ orientation +"'>\
                   ROTATE\
               </button>\
             </div>");
+          if (orientation == "180") {
+            $("[data-action='trail'][data-card='"+cardId+"']").css("border","5px solid blue");
+            // console.log("upside down");
+          } else {
+            $("[data-action='trail'][data-card='"+cardId+"']").css("border","5px solid red");
+            // console.log("right side up");
+          };
         };
       };
+
+      $("[data-orientation]").click((e)=>{
+        e.preventDefault();
+        let eventId = event.target.dataset.card;
+        let eventOrientation = event.target.dataset.orientation;
+        if (eventOrientation == "0") {
+          eventOrientation = "180";
+        } else {
+          eventOrientation = "0";
+        };
+        let orientationParam = "rotate=true&card=" + eventId + "&orientation=" + window.encodeURIComponent(eventOrientation);
+        let rotateRequest = new XMLHttpRequest();
+        rotateRequest.onload = () => {
+          // console.log("onload on switchPlayer");
+        };
+        rotateRequest.open('POST',currentPlyUrl,true);
+        rotateRequest.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+        rotateRequest.send(orientationParam);
+        console.log("Rotate works");
+      });
 
       $("[data-action='trail']").click(()=>{
         cardAction = "trail";
         cardNum = event.target.dataset.card;
-        cardHalf = event.target.dataset.half;
         console.log("Card selected: " + cardAction);
       });
+
       $("[data-action='supply']").click(()=>{
         cardAction = "supply";
         console.log("Card selected: " + cardAction);
@@ -410,8 +437,7 @@
         let playerParam = "player=" + window.encodeURIComponent(gameData[0]["current_player"]);
         let actionParam = "&action=" + window.encodeURIComponent(cardAction);
         let cardParam = "&cardId=" + window.encodeURIComponent(cardNum);
-        let halfParam = "&half=" + window.encodeURIComponent(cardHalf);
-        let fullParam = playerParam + actionParam + cardParam + halfParam;
+        let fullParam = playerParam + actionParam + cardParam;
         console.log(fullParam);
         let turnRequest = new XMLHttpRequest();
         turnRequest.onload = () => {
@@ -424,6 +450,7 @@
         // To make sure this function is carried out only once...
         turnOver = true;
         cardAction = null;
+        cardNum = null;
         $(".clickBttn")
           .css("background-color","lightgrey");
       } else {
@@ -431,7 +458,7 @@
       };
     };
 
-    // $(".clickBttn").click(switchPlayer);
+    // Ends players turn, sends to next player
     document.getElementById('nextTurn').addEventListener('submit',switchPlayer);
 
     // Initial data check

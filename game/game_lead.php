@@ -152,6 +152,23 @@
     };
   };
 
+  // Rotates a selected trail card
+  if (isset($_POST['rotate'])) {
+    $trailId = htmlentities($_POST['card']);
+    $newOrientation = htmlentities($_POST['orientation']);
+    $trailJsonFile = file_get_contents("json/game_".$getGameId."/trail_".$getGameId.".json");
+    $decodedTrailJson = json_decode($trailJsonFile, true);
+    for ($checkNum = 0; $checkNum < count($decodedTrailJson); $checkNum++) {
+      if ($decodedTrailJson[$checkNum]["trail_id"] == $trailId) {
+        $decodedTrailJson[$checkNum]["orientation"] = $newOrientation;
+      };
+    };
+    $updatedTrailJson = json_encode($decodedTrailJson);
+    file_put_contents("json/game_".$getGameId."/trail_".$getGameId.".json",$updatedTrailJson);
+    header("Location: game.php?token=".$_GET['token']);
+    exit;
+  };
+
   // This function is a) carried out within the 'player' POST (see below) and b) only happens if a trail card was used.
   function trailCardUse($pdoParam,$thisGameId) {
     $oneLessStmt = $pdoParam->prepare("UPDATE Game SET until_end = until_end - 1 WHERE game_id=:gm");

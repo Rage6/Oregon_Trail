@@ -257,7 +257,21 @@
         let cardUser = traData[trailNum]["picked_by"];
         if (cardUser == thisPlayer) {
           let cardId = traData[trailNum]["trail_id"];
-          $(".trailList").append("<img data-action='trail' data-card='" + cardId + "' data-half='top' src='../images/cards/trails/trail_"+ modeId +"_" + cardId + ".JPG'>");
+          let modeName = currentGameData[0]["template_name"];
+          $(".trailList").append("\
+            <div>\
+              <img\
+                data-action='trail'\
+                data-card='" + cardId + "'\
+                data-half='top'\
+                src='../images/cards/trails/" + modeName + "/trail_"+ modeId +"_" + cardId + ".JPG'>\
+              <button\
+                data-action='trail'\
+                data-card='" + cardId + "'\
+                data-rotate>\
+                  ROTATE\
+              </button>\
+            </div>");
         };
       };
 

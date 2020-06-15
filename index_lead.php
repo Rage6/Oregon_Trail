@@ -83,7 +83,7 @@
         // ... and creates the game's new folder...
         mkdir("game/json/game_".$gameId);
         // ... and creates the new game JSON file...
-        $gameInfoStmt = $pdo->prepare("SELECT * FROM Game WHERE game_id=:gid");
+        $gameInfoStmt = $pdo->prepare("SELECT * FROM Game INNER JOIN Mode WHERE game_id=:gid AND Game.mode_id=Mode.mode_id");
         $gameInfoStmt->execute(array(
           ':gid'=>(int)$gameId
         ));
@@ -106,34 +106,34 @@
         $newPlayerFile = fopen("game/json/game_".$gameId."/player_".$gameId.".json","w");
         fwrite($newPlayerFile, json_encode($playerInfoArray));
         fclose($newPlayerFile);
-        // ... and creates the Trail card file...
-        $trailInfoStmt = $pdo->prepare("SELECT trail_id,picked_by,how_many,top_num,bottom_num,has_calamity,can_drown,lose_supplies,is_fort,is_town FROM Trail JOIN RouteDesign JOIN Mode WHERE Mode.mode_id=:mid AND RouteDesign.route_id=Mode.route_id AND Trail.route_id=RouteDesign.route_id");
-        $trailInfoStmt->execute(array(
-          ':mid'=>(int)htmlentities($_POST['modeId'])
-        ));
-        $trailInfoArray = [];
-        while ($oneTrailInfo = $trailInfoStmt->fetch(PDO::FETCH_ASSOC)) {
-          $trailInfoArray[] = $oneTrailInfo;
-        };
-        // This is where to expand the trail cards to the full deck before creating the JSON file
-        $countTrailStmt = $pdo->prepare("SELECT COUNT('trail_id') AS count FROM Trail JOIN RouteDesign JOIN Mode WHERE Mode.mode_id=:mo AND RouteDesign.route_id=Mode.route_id AND Trail.route_id=RouteDesign.route_id");
-        $countTrailStmt->execute(array(
-          ':mo'=>(int)htmlentities($_POST['modeId'])
-        ));
-        $trailTotal = $countTrailStmt->fetch(PDO::FETCH_ASSOC)['count'];
-        for ($trailNum = 0; $trailNum < $trailTotal; $trailNum++) {
-          $trailCard = $trailInfoArray[$trailNum];
-          if ($trailCard['how_many'] > 1) {
-            $moreTrailCards = $trailCard['how_many'] - 1;
-            for ($addTrail = 0; $addTrail < $moreTrailCards; $addTrail++) {
-              $trailInfoArray[] = $trailCard;
-            };
-          };
-        };
-
-        $newTrailFile = fopen("game/json/game_".$gameId."/trail_".$gameId.".json","w");
-        fwrite($newTrailFile, json_encode($trailInfoArray));
-        fclose($newTrailFile);
+        // // ... and creates the Trail card file...
+        // $trailInfoStmt = $pdo->prepare("SELECT trail_id,picked_by,how_many,top_num,bottom_num,has_calamity,can_drown,lose_supplies,is_fort,is_town FROM Trail JOIN RouteDesign JOIN Mode WHERE Mode.mode_id=:mid AND RouteDesign.route_id=Mode.route_id AND Trail.route_id=RouteDesign.route_id");
+        // $trailInfoStmt->execute(array(
+        //   ':mid'=>(int)htmlentities($_POST['modeId'])
+        // ));
+        // $trailInfoArray = [];
+        // while ($oneTrailInfo = $trailInfoStmt->fetch(PDO::FETCH_ASSOC)) {
+        //   $trailInfoArray[] = $oneTrailInfo;
+        // };
+        // // This is where to expand the trail cards to the full deck before creating the JSON file
+        // $countTrailStmt = $pdo->prepare("SELECT COUNT('trail_id') AS count FROM Trail JOIN RouteDesign JOIN Mode WHERE Mode.mode_id=:mo AND RouteDesign.route_id=Mode.route_id AND Trail.route_id=RouteDesign.route_id");
+        // $countTrailStmt->execute(array(
+        //   ':mo'=>(int)htmlentities($_POST['modeId'])
+        // ));
+        // $trailTotal = $countTrailStmt->fetch(PDO::FETCH_ASSOC)['count'];
+        // for ($trailNum = 0; $trailNum < $trailTotal; $trailNum++) {
+        //   $trailCard = $trailInfoArray[$trailNum];
+        //   if ($trailCard['how_many'] > 1) {
+        //     $moreTrailCards = $trailCard['how_many'] - 1;
+        //     for ($addTrail = 0; $addTrail < $moreTrailCards; $addTrail++) {
+        //       $trailInfoArray[] = $trailCard;
+        //     };
+        //   };
+        // };
+        copy("game/json/templates/original/trail_template.json","game/json/game_".$gameId."/trail_".$gameId.".json");
+        // $newTrailFile = fopen("game/json/game_".$gameId."/trail_".$gameId.".json","w");
+        // fwrite($newTrailFile, json_encode($trailInfoArray));
+        // fclose($newTrailFile);
         // ... and finally goes to the game itself.
         $_SESSION['message'] = "<div style='color:green'>Your party was created!</div>";
         header("Location: game/game.php?token=".$newToken);

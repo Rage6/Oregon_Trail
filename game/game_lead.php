@@ -167,13 +167,19 @@
   };
 
   // // The function to set update the 'current_trail'
-  // function newCurrentTrail($pdoParam,$thisGameId) {
-  //   $updateCardStmt = $pdoParam->prepare("UPDATE Game SET current_trail = :ct WHERE game_id = :ge");
-  //   $updateCardStmt->execute(array(
-  //     ':ct'=>(int)htmlentities($_POST['cardId']),
-  //     ':ge'=>$getGameId
-  //   ));
-  // };
+  function newCurrentTrail($pdoParam,$thisGameId) {
+    $updateCardStmt = $pdoParam->prepare("UPDATE Game SET current_trail = :ct WHERE game_id = :ge");
+    $updateCardStmt->execute(array(
+      ':ct'=>(int)htmlentities($_POST['cardId']),
+      ':ge'=>$thisGameId
+    ));
+    $getNewTrail = $pdoParam->prepare("SELECT current_trail FROM Game WHERE game_id=:ga");
+    $getNewTrail->execute(array(
+      ':ga'=>$thisGameId
+    ));
+    $newTrail = $getNewTrail->fetch(PDO::FETCH_ASSOC)['current_trail'];
+    return $newTrail;
+  };
 
   // Turn the next player into the current player
   if (isset($_POST['player'])) {
@@ -181,7 +187,7 @@
     $currentTrail = $decodedGameJson[0]["current_trail"];
     if ($_POST['action'] == "trail") {
       $lessTrail = trailCardUse($pdo,$getGameId);
-      $currentTrail = $_POST['cardId'];
+      $currentTrail = newCurrentTrail($pdo,$getGameId);
     };
     // First, identify the next player's id number
     $currentPlayer = (int)htmlentities($_POST['player']);

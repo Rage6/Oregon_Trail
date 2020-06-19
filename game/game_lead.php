@@ -169,6 +169,26 @@
     exit;
   };
 
+  if (isset($_POST['selectCard'])) {
+    // if ($_POST['selectCard'] == 'trail') {
+      $selectTrailId = htmlentities($_POST['trailCard']);
+      $selectPlayer = htmlentities($_POST['selectPlayer']);
+      $selectPlayerJsonFile = file_get_contents("json/game_".$getGameId."/player_".$getGameId.".json");
+      $decodedPlayerJson = json_decode($selectPlayerJsonFile, true);
+      for ($playerNum = 0; $playerNum < count($decodedPlayerJson); $playerNum++) {
+        if ($decodedPlayerJson[$playerNum]["player_id"] == $selectPlayer) {
+          $decodedPlayerJson[$playerNum]["select_trail"] = $selectTrailId;
+        };
+      };
+      $updatedPlayerJson = json_encode($decodedPlayerJson);
+      file_put_contents("json/game_".$getGameId."/player_".$getGameId.".json",$updatedPlayerJson);
+    // } else {
+    //   //
+    // };
+    header("Location: game.php?token=".$_GET['token']);
+    exit;
+  };
+
   // This function is a) carried out within the 'player' POST (see below) and b) only happens if a trail card was used.
   function trailCardUse($pdoParam,$thisGameId) {
     $oneLessStmt = $pdoParam->prepare("UPDATE Game SET until_end = until_end - 1 WHERE game_id=:gm");
@@ -180,6 +200,9 @@
       ':ga'=>$thisGameId
     ));
     $trailLeft = $trailLeftStmt->fetch(PDO::FETCH_ASSOC)['until_end'];
+    // echo("<div>");
+    // var_dump($trailLeft);
+    // echo("</div>");
     return $trailLeft;
   };
 
@@ -202,7 +225,7 @@
   if (isset($_POST['player'])) {
     $lessTrail = null;
     $currentTrail = $decodedGameJson[0]["current_trail"];
-    if ($_POST['action'] == "trail") {
+    if (isset($_POST['action'])) {
       $lessTrail = trailCardUse($pdo,$getGameId);
       $currentTrail = newCurrentTrail($pdo,$getGameId);
     };
@@ -244,6 +267,7 @@
     $decodedGameJson = json_decode($gameJsonFile, true);
     $decodedGameJson[0]["current_player"] = strval($nextPlayerId);
     $decodedGameJson[0]["until_end"] = $lessTrail;
+    // $decodedGameJson[0]["until_end"] = "check";
     $decodedGameJson[0]["current_trail"] = $currentTrail;
     $updatedGameJson = json_encode($decodedGameJson);
     file_put_contents("json/game_".$getGameId."/game_".$getGameId.".json",$updatedGameJson);

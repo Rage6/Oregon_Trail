@@ -45,6 +45,8 @@
       $addedPlayer->first_name = htmlentities($_POST['firstName']);
       $addedPlayer->last_name = htmlentities($_POST['lastName']);
       $addedPlayer->alive = "1";
+      $addedPlayer->select_trail = "0";
+      $addedPlayer->select_supply = "0";
       $addedPlayer->skips_left = "0";
       $addedPlayer->is_shop = "0";
       $addedPlayer->game_id = $getGameId;

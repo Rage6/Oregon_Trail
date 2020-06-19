@@ -19,6 +19,36 @@
     <!-- <script src="js/main.js"></script> -->
   </head>
   <body data-game="<?php echo($getGameId) ?>" data-player="<?php echo($_SESSION['player_id']) ?>" data-mode="<?php echo($getGameMode) ?>">
+
+    <div class="playerInfo">
+      <div class="playerInfoBttn" id="playerInfoBttn">
+        <?php echo("<div>".$thisPlayerInfo[0]["username"]."</div>") ?>
+        <div id="healthStatus">
+        </div>
+      </div>
+      <div class="playerInfoBox" id="playerInfoBox">
+        <div class="playerInfoContent">
+          <div>
+            <u>Party Members</u>
+          </div>
+          <div class="playerList">
+          </div>
+          <?php
+            if ($partyHead == true) {
+              if ($isLocal == true) {
+                $localAttachment = "Oregon_Trail/";
+              } else {
+                $localAttachment = "";
+              };
+              echo("
+          <div id='ldrOptBttn' class='ldrOptBttn'>
+            Party Leader Options
+          </div>");
+            };
+          ?>
+        </div>
+      </div>
+    </div>
     <?php
       if ($partyHead == true) {
         if ($isLocal == true) {
@@ -90,35 +120,6 @@
         ");
       };
     ?>
-    <div class="playerInfo">
-      <div class="playerInfoBttn" id="playerInfoBttn">
-        <?php echo("<div>".$thisPlayerInfo[0]["username"]."</div>") ?>
-        <div id="healthStatus">
-        </div>
-      </div>
-      <div class="playerInfoBox" id="playerInfoBox">
-        <div class="playerInfoContent">
-          <div>
-            <u>Party Members</u>
-          </div>
-          <div class="playerList">
-          </div>
-          <?php
-            if ($partyHead == true) {
-              if ($isLocal == true) {
-                $localAttachment = "Oregon_Trail/";
-              } else {
-                $localAttachment = "";
-              };
-              echo("
-          <div id='ldrOptBttn' class='ldrOptBttn'>
-            Party Leader Options
-          </div>");
-            };
-          ?>
-        </div>
-      </div>
-    </div>
     <?php
       if (isset($_SESSION['message'])) {
         echo($_SESSION['message']);
@@ -236,7 +237,7 @@
     let firstRun = true;
 
     // Updates the player's trail cards on the screen
-    const trailUpdateScreen = (traData) => {
+    const trailUpdateScreen = (traData,selectTr,selectSup) => {
       // The 6 points at which a trail starts and stops are labeled as such:
       //   1    2    3   (TOP)              6    5    4   (BOTTOM)
       //  -------------                    -------------
@@ -251,7 +252,6 @@
       //  |           |                    |           |
       //  -------------                    -------------
       //   4    5    6   (BOTTOM)           3    2    1    (TOP)
-
       $(".trailList").empty();
       for (let trailNum = 0; trailNum < traData.length; trailNum++) {
         let cardUser = traData[trailNum]["picked_by"];
@@ -273,11 +273,13 @@
               </button>\
             </div>");
           if (orientation == "180") {
-            $("[data-action='trail'][data-card='"+cardId+"']").css("border","5px solid blue");
-            // console.log("upside down");
+            $("[data-action='trail'][data-card='"+cardId+"']").css("transform","rotate(180deg)");
           } else {
-            $("[data-action='trail'][data-card='"+cardId+"']").css("border","5px solid red");
-            // console.log("right side up");
+            $("[data-action='trail'][data-card='"+cardId+"']").css("transform","rotate(0deg)");
+          };
+          if (cardId == selectTr) {
+            let labelCard = "[data-card='" + cardId + "']";
+            $(labelCard).css('border','5px solid yellow');
           };
         };
       };
@@ -291,7 +293,7 @@
         } else {
           eventOrientation = "0";
         };
-        let orientationParam = "rotate=true&card=" + eventId + "&orientation=" + window.encodeURIComponent(eventOrientation);
+        let orientationParam = "rotate="+window.encodeURIComponent(true)+"&card=" + window.encodeURIComponent(eventId) + "&orientation=" + window.encodeURIComponent(eventOrientation);
         let rotateRequest = new XMLHttpRequest();
         rotateRequest.onload = () => {
           // console.log("onload on switchPlayer");
@@ -300,11 +302,22 @@
         rotateRequest.setRequestHeader('Content-type','application/x-www-form-urlencoded');
         rotateRequest.send(orientationParam);
         console.log("Rotate works");
+        checkCurrentData();
       });
 
-      $("[data-action='trail']").click(()=>{
+      $("[data-action='trail']").click((e)=>{
         cardAction = "trail";
-        cardNum = event.target.dataset.card;
+        e.preventDefault();
+        let trailCard = event.target.dataset.card;
+        let trailParam = "selectCard=trail&selectPlayer=" + window.encodeURIComponent(thisPlayer) + "&trailCard=" + window.encodeURIComponent(trailCard);
+        let trailReq = new XMLHttpRequest();
+        trailReq.onload = () => {
+          // console.log("onload on switchPlayer");
+        };
+        trailReq.open('POST',currentPlyUrl,true);
+        trailReq.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+        trailReq.send(trailParam);
+        checkCurrentData();
         console.log("Card selected: " + cardAction);
       });
 
@@ -315,7 +328,7 @@
     };
 
     // Uses the updated Game data
-    const gmUpdateScreen = (gmData,tlData) => {
+    const gmUpdateScreen = (gmData,tlData,theTrail,theSupply) => {
       if (gmData[0]['active'] == "1") {
         $(".ifStarted").css("display","block");
         $(".startBox").css("display","none");
@@ -331,7 +344,7 @@
         $(".ifStarted").css("display","none");
       };
       $("#currentTrail").text(gmData[0]['until_end']);
-      trailUpdateScreen(tlData);
+      trailUpdateScreen(tlData,theTrail,theSupply);
       // This display the .yourTurnBox element to the current player by comparing the current player's id (in JSON) the player's id (in their HTML)
       // Note: This could be used for cheating! To prevent it, make the HTML value much less predictable, or build it in so that each iteration confirms it
       if (gmData[0]["current_player"] == thisPlayer) {
@@ -352,6 +365,8 @@
           <div>Full Name</div>\
           <div>Health</div>\
         </div>");
+      let selectedTrail = null;
+      let selectedSupply = null;
       for (userNum = 0; userNum < plyData.length; userNum++) {
         $(".playerList").append("\
           <div class='playerRow'>\
@@ -360,6 +375,8 @@
           </div>");
         // Shows who the current player is
         if (plyData[userNum]["player_id"] == gmeData[0]["current_player"]) {
+          selectedTrail = plyData[userNum]["select_trail"];
+          selectedSupply = plyData[userNum]["select_supply"];
           $("#currentName").text(plyData[userNum]["username"]);
         };
         // Shows if the user's character is alive or not
@@ -371,7 +388,7 @@
           };
         };
       };
-      gmUpdateScreen(gmeData,trlData);
+      gmUpdateScreen(gmeData,trlData,selectedTrail,selectedSupply);
     };
 
     const trailRequest = (plData,gData) => {
@@ -400,8 +417,7 @@
         if (playerRequest.status == 200) {
           let playerData = JSON.parse(playerRequest.responseText);
           console.log(playerData);
-          trailRequest(playerData,gmData)
-          // plyUpdateScreen(playerData,gmData);
+          trailRequest(playerData,gmData);
         };
       };
       playerRequest.onerror = () => {
@@ -435,6 +451,7 @@
       e.preventDefault();
       if (turnOver == false) {
         let playerParam = "player=" + window.encodeURIComponent(gameData[0]["current_player"]);
+        console.log("SwitchPlayer used " + cardAction);
         let actionParam = "&action=" + window.encodeURIComponent(cardAction);
         let cardParam = "&cardId=" + window.encodeURIComponent(cardNum);
         let fullParam = playerParam + actionParam + cardParam;

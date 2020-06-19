@@ -8,11 +8,11 @@ body {
 }
 
 .ldrOptBox {
-  margin-top: 125px;
-  margin-left: 3%;
+  /* margin-top: 125px;
+  margin-left: 3%; */
   padding: 10px 2%;
   /* display: none; */
-  position: fixed;
+  /* position: fixed; */
   background-color: orange;
   width: 90%;
 }
